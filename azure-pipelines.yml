@@ -21,10 +21,12 @@ steps:
   displayName: 'Setup Terraform environment'
 
 - script: |
+    cd azure/
     terraform apply -auto-approve
   displayName: 'Deploy Azure Resources with Terraform'
 
 - script: |
+    cd azure/
     terraform destroy -auto-approve
   displayName: 'Destroy Azure Resources'
   enabled: false
