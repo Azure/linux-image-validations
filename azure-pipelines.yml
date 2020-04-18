@@ -1,0 +1,30 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+    echo "Setting up Terraform"
+    cd azure/
+    terraform init
+  env:
+    TF_VAR_image_name: $(image-name)
+    TF_VAR_blob_uri: $(blob-uri)
+    TF_VAR_existing_rg: $(existing-rg)
+  displayName: 'Setup Terraform environment'
+
+- script: |
+    terraform apply -auto-approve
+  displayName: 'Deploy Azure Resources with Terraform'
+
+- script: |
+    terraform destroy -auto-approve
+  displayName: 'Destroy Azure Resources'
+  enabled: false
