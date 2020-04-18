@@ -15,27 +15,32 @@ steps:
     cd azure/
     terraform init
   displayName: 'Setup Terraform environment'
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: $(subscription-name)
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      export TF_VAR_image_name=$(image-name)
-      export TF_VAR_blob_uri=$(blob-uri)
-      export TF_VAR_existing_rg=$(existing-rg)
+
+- script: |
       cd azure/
       terraform apply -auto-approve
+  env:
+    TF_VAR_image_name: $(image-name)
+    TF_VAR_blob_uri: $(blob-uri)
+    TF_VAR_existing_rg: $(existing-rg)
+    ARM_CLIENT_ID: $(client-id)
+    ARM_CLIENT_SECRET: $(client-secret)
+    ARM_SUBSCRIPTION_ID: $(subscription-id)
+    ARM_TENANT_ID: $(tenant-id)
+
   displayName: 'Deploy Azure Resources with Terraform'
 
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: $(subscription-name)
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
+- script: |
       cd azure/
       terraform destroy -auto-approve
+  env:
+    TF_VAR_image_name: $(image-name)
+    TF_VAR_blob_uri: $(blob-uri)
+    TF_VAR_existing_rg: $(existing-rg)
+    ARM_CLIENT_ID: $(client-id)
+    ARM_CLIENT_SECRET: $(client-secret)
+    ARM_SUBSCRIPTION_ID: $(subscription-id)
+    ARM_TENANT_ID: $(tenant-id)
   displayName: 'Destroy Azure Resources with Terraform'
   enabled: false
 
