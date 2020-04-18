@@ -19,14 +19,24 @@ steps:
     TF_VAR_blob_uri: $(blob-uri)
     TF_VAR_existing_rg: $(existing-rg)
   displayName: 'Setup Terraform environment'
-
-- script: |
-    cd azure/
-    terraform apply -auto-approve
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: $(subscription-name)
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      cd azure/
+      terraform apply -auto-approve
   displayName: 'Deploy Azure Resources with Terraform'
 
-- script: |
-    cd azure/
-    terraform destroy -auto-approve
-  displayName: 'Destroy Azure Resources'
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: $(subscription-name)
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      cd azure/
+      terraform destroy -auto-approve
+  displayName: 'Destroy Azure Resources with Terraform'
   enabled: false
+
