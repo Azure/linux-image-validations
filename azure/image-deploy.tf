@@ -4,7 +4,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "azure_rg_temp" {
-    name = "ImageTesting"
+    name = var.testing_rg
     location = "West US"
 }
 

@@ -1,10 +1,10 @@
 
 data "azurerm_resource_group" "azure_rg_existing" {
-    name = "tuxvalidations"
+    name = var.existing_rg
 }
 
 resource "azurerm_virtual_network" "image_testing_vnet" {
-  name                = "image-testing-vnet"
+  name                = var.image_testing_vnet
   address_space       = ["10.0.0.0/16"]
   location            = data.azurerm_resource_group.azure_rg_existing.location
   resource_group_name = data.azurerm_resource_group.azure_rg_existing.name
