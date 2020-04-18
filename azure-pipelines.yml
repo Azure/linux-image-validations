@@ -14,10 +14,6 @@ steps:
     echo "Setting up Terraform"
     cd azure/
     terraform init
-  env:
-    TF_VAR_image_name: $(image-name)
-    TF_VAR_blob_uri: $(blob-uri)
-    TF_VAR_existing_rg: $(existing-rg)
   displayName: 'Setup Terraform environment'
 - task: AzureCLI@2
   inputs:
@@ -25,6 +21,9 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
+      export TF_VAR_image_name=$(image-name)
+      export TF_VAR_blob_uri=$(blob-uri)
+      export TF_VAR_existing_rg=$(existing-rg)
       cd azure/
       terraform apply -auto-approve
   displayName: 'Deploy Azure Resources with Terraform'
