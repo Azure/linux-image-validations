@@ -43,3 +43,13 @@ variable "image_testing_vnet" {
     description = "--vnet-name for image_testing. Defaults to 'image-testing-vnet'"
     default = "image-testing-vnet"
 }
+
+variable "file_uris" {
+    type = string
+    description = "List of file_uris passed"
+}
+
+variable "vhd_name" {
+    type = string
+    description = "Name of the VHD that is used for Terraform Deployment"
+}
