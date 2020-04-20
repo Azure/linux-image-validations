@@ -18,6 +18,7 @@ steps:
 
 - script: |
       cd azure/
+      echo "$TF_VAR_file_uris"
       terraform plan
       terraform apply -auto-approve
   env:
