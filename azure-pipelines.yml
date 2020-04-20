@@ -36,6 +36,7 @@ steps:
   env:
     TF_VAR_image_name: $(image-name)
     TF_VAR_blob_uri: $(blob-uri)
+    TF_VAR_file_uris: $(file-uris)
     ARM_CLIENT_ID: $(client-id)
     ARM_CLIENT_SECRET: $(client-secret)
     ARM_SUBSCRIPTION_ID: $(subscription-id)
