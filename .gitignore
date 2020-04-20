@@ -30,3 +30,7 @@ override.tf.json
 
 # Ignore IDE files
 *.vscode
+
+# Ignore Python cache files
+*.pyc
+**/__pycache__/**
