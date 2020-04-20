@@ -27,7 +27,7 @@ resource "azurerm_virtual_machine_extension" "gen2_extension" {
 
     settings = <<SETTINGS
         {
-            "fileUris": ${jsonencode("${split(" ", var.file_uris)}")},
+            "fileUris": ${jsonencode("${split(",", var.file_uris)}")},
             "commandToExecute": "./validate_upload.sh ${var.vhd_name}.vhd gen2"
         }
     SETTINGS
