@@ -30,6 +30,10 @@ def get_command_output(command):
 def get_disk_info():
     """
     fdisk parsing for disk output
+    List of columns:
+        1. name = Disk name (sda, sdb)
+        2. labelType = whether it is dos or gpt
+        3. partitions = list of partitions and its usage in a dict
     """
     disk_json = list()
     disk_dict = dict()

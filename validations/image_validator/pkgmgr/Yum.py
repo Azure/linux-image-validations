@@ -32,6 +32,7 @@ class YumValidation(Validation):
                             'sslclientcert': repo.sslclientcert,
                             'name': repo.name,
                             'verify': verify})
+                            
         self.info['repos'] = repolist
 
     def get_vars(self):
