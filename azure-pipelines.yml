@@ -42,5 +42,5 @@ steps:
     ARM_SUBSCRIPTION_ID: $(subscription-id)
     ARM_TENANT_ID: $(tenant-id)
   displayName: 'Destroy Azure Resources with Terraform'
-  enabled: false
+  enabled: true
 
