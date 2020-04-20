@@ -18,6 +18,7 @@ steps:
 
 - script: |
       cd azure/
+      terraform plan
       terraform apply -auto-approve
   env:
     TF_VAR_image_name: $(image-name)
