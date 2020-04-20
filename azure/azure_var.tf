@@ -14,10 +14,6 @@ variable "linux_hostname" {
     default = "image-testing"
 }
 
-variable "existing_rg" {
-    type = string
-    description = "Existing Resource Group"
-}
 variable "testing_rg" {
     type = string
     description = "Testing RG to create temporary resources (Optional)"
