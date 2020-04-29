@@ -12,9 +12,9 @@ pool:
 steps:
 - script: |
     echo "Setting up vhd availability (Optional)"
-    azcopy --help
-    azcopy login --service-principal $(client-id)
-    azcopy cp $(blob-sas-uri) $BLOB_URI
+    wget https://aka.ms/downloadazcopy-v10-linux -O azcopy.tar.gz && tar -C /tmp -xvzf azcopy.tar.gz
+    /tmp/azcopy_linux_*/azcopy login --service-principal $(client-id)
+    /tmp/azcopy_linux_*/azcopy cp $(blob-sas-uri) $BLOB_URI
   env:
     AZCOPY_SPA_CLIENT_SECRET: $(client-secret)
   displayName: 'copy vhd sas to current subscription'
