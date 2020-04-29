@@ -34,3 +34,6 @@ override.tf.json
 # Ignore Python cache files
 *.pyc
 **/__pycache__/**
+
+# Ignore deployment files
+*deployment

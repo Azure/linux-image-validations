@@ -18,11 +18,13 @@ steps:
 
 - script: |
       cd azure/
+      terraform plan
       terraform apply -auto-approve
   env:
     TF_VAR_image_name: $(image-name)
     TF_VAR_blob_uri: $(blob-uri)
-    TF_VAR_existing_rg: $(existing-rg)
+    TF_VAR_file_uris: $(file-uris)
+    TF_VAR_vhd_name: $(vhd-name)
     ARM_CLIENT_ID: $(client-id)
     ARM_CLIENT_SECRET: $(client-secret)
     ARM_SUBSCRIPTION_ID: $(subscription-id)
@@ -36,11 +38,13 @@ steps:
   env:
     TF_VAR_image_name: $(image-name)
     TF_VAR_blob_uri: $(blob-uri)
-    TF_VAR_existing_rg: $(existing-rg)
+    TF_VAR_file_uris: $(file-uris)
+    TF_VAR_vhd_name: $(vhd-name)
     ARM_CLIENT_ID: $(client-id)
     ARM_CLIENT_SECRET: $(client-secret)
     ARM_SUBSCRIPTION_ID: $(subscription-id)
     ARM_TENANT_ID: $(tenant-id)
   displayName: 'Destroy Azure Resources with Terraform'
-  enabled: false
+  enabled: true
+  condition: always()
 
