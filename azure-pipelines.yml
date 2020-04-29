@@ -11,20 +11,20 @@ pool:
 
 steps:
 - script: |
-    echo "Setting up Terraform"
-    cd azure/
-    terraform init
-  displayName: 'Setup Terraform environment'
-
-- script: |
     echo "Setting up vhd availability (Optional)"
+    azcopy --help
     azcopy login --service-principal $(client-id)
-    azcopy $(blob-sas-uri) $BLOB_URI
-    terraform init
+    azcopy cp $(blob-sas-uri) $BLOB_URI
   env:
     AZCOPY_SPA_CLIENT_SECRET: $(client-secret)
   displayName: 'copy vhd sas to current subscription'
   enabled: true
+
+- script: |
+    echo "Setting up Terraform"
+    cd azure/
+    terraform init
+  displayName: 'Setup Terraform environment'
 
 - script: |
       cd azure/
