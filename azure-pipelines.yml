@@ -13,7 +13,7 @@ steps:
 - script: |
     echo "Setting up vhd availability (Optional)"
     wget https://aka.ms/downloadazcopy-v10-linux -O azcopy.tar.gz && tar -C /tmp -xvzf azcopy.tar.gz
-    /tmp/azcopy_linux_*/azcopy login --service-principal --application-id $(client-id)
+    /tmp/azcopy_linux_*/azcopy login --service-principal --application-id $(client-id) --tenant-id $(tenant-id)
     /tmp/azcopy_linux_*/azcopy copy "$(blob-sas-uri)" "$BLOB_URI"
   env:
     AZCOPY_SPA_CLIENT_SECRET: $(client-secret)
