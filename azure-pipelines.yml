@@ -34,7 +34,7 @@ steps:
       terraform apply -auto-approve
   env:
     TF_VAR_image_name: $(image-name)
-    TF_VAR_blob_uri: $(blob-uri)
+    TF_VAR_blob_uri: $(blob_uri)
     TF_VAR_file_uris: $(file-uris)
     TF_VAR_vhd_name: $(vhd-name)
     TF_VAR_testing_rg: image-testing-$(Agent.Id)
