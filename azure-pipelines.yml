@@ -10,13 +10,13 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+
 - script: |
     echo "Setting up vhd availability (Optional)"
+    az login -u $(client-id) -p $(client-secret)
     wget https://aka.ms/downloadazcopy-v10-linux -O azcopy.tar.gz && tar -C /tmp -xvzf azcopy.tar.gz
-    SAS_TOKEN=$(az storage container generate-sas --account-name tuximagestore --name images --permissions acdlrw --expiry $(date -v +1d '+%Y-%m-%dT%H:%M:%SZ'))
+    SAS_TOKEN=$(az storage container generate-sas --account-name $(storage-account) --name $(container-name) --permissions acdlrw --expiry $(date -d "+2 days" '+%Y-%m-%dT%H:%M:%SZ'))
     /tmp/azcopy_linux_*/azcopy copy "$(blob-sas-uri)" "$BLOB_URI?$SAS_TOKEN"
-  env:
-    AZCOPY_SPA_CLIENT_SECRET: $(client-secret)
   displayName: 'copy vhd sas to current subscription'
   enabled: true
 
