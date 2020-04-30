@@ -10,6 +10,16 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+
+- script: |
+    az login --service-principal -u $(client-id) -p $(client-secret) --tenant $(tenant-id)
+    end=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%M:%SZ'`
+    TARGET_SAS_TOKEN=$(az storage account generate-sas --permissions clrwapud --account-name tuximagestore --services bfqt --resource-types sco --expiry $end -o tsv)
+    wget https://aka.ms/downloadazcopy-v10-linux -O azcopy.tar.gz && tar -C /tmp -xvzf azcopy.tar.gz
+    /tmp/azcopy_linux_*/azcopy copy "$(blob-sas-uri)" "$TARGET_BLOB_URI?$TARGET_SAS_TOKEN"
+  displayName: 'Setting up VHD availability from PROD Subscription to TEST (Optional)'
+  enabled: true
+
 - script: |
     echo "Setting up Terraform"
     cd azure/
@@ -22,7 +32,7 @@ steps:
       terraform apply -auto-approve
   env:
     TF_VAR_image_name: $(image-name)
-    TF_VAR_blob_uri: $(blob-uri)
+    TF_VAR_blob_uri: $(blob_uri)
     TF_VAR_file_uris: $(file-uris)
     TF_VAR_vhd_name: $(vhd-name)
     TF_VAR_testing_rg: image-testing-$(Agent.Id)
@@ -38,7 +48,7 @@ steps:
       terraform destroy -auto-approve
   env:
     TF_VAR_image_name: $(image-name)
-    TF_VAR_blob_uri: $(blob-uri)
+    TF_VAR_blob_uri: $(blob_uri)
     TF_VAR_file_uris: $(file-uris)
     TF_VAR_vhd_name: $(vhd-name)
     TF_VAR_testing_rg: image-testing-$(Agent.Id)
