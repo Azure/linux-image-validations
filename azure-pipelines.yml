@@ -17,6 +17,7 @@ steps:
     end=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'`
     SAS_TOKEN=$(az storage account generate-sas --permissions clruwap --account-name $(storage-account) --services b --resource-types sco --expiry $end -o tsv)
     wget https://aka.ms/downloadazcopy-v10-linux -O azcopy.tar.gz && tar -C /tmp -xvzf azcopy.tar.gz
+    echo "$BLOB_URI?$SAS_TOKEN"
     /tmp/azcopy_linux_*/azcopy copy "$(blob-sas-uri)" "$BLOB_URI?$SAS_TOKEN"
   displayName: 'copy vhd sas to current subscription'
   enabled: true
