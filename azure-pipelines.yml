@@ -14,7 +14,7 @@ steps:
 - script: |
     echo "Setting up vhd availability (Optional)"
     az login --service-principal -u $(client-id) -p $(client-secret) --tenant $(tenant-id)
-    end=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'`
+    end=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%M:%SZ'`
     SAS_TOKEN=$(az storage account generate-sas --permissions clrwapud --account-name tuximagestore --services bfqt --resource-types sco --expiry $end -o tsv)
     wget https://aka.ms/downloadazcopy-v10-linux -O azcopy.tar.gz && tar -C /tmp -xvzf azcopy.tar.gz
     echo "$BLOB_URI?$SAS_TOKEN"
