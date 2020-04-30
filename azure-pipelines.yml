@@ -14,8 +14,9 @@ steps:
 - script: |
     echo "Setting up vhd availability (Optional)"
     az login --service-principal -u $(client-id) -p $(client-secret) --tenant $(tenant-id)
+    end=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'`
+    SAS_TOKEN=$(az storage account generate-sas --permissions clrw --account-name $(storage-account) --services b --resource-types sco --expiry $end -o tsv)
     wget https://aka.ms/downloadazcopy-v10-linux -O azcopy.tar.gz && tar -C /tmp -xvzf azcopy.tar.gz
-    SAS_TOKEN=$(az storage container generate-sas --account-name $(storage-account) --name $(container-name) --permissions acdlrw --expiry $(date -d "+2 days" '+%Y-%m-%dT%H:%M:%SZ'))
     /tmp/azcopy_linux_*/azcopy copy "$(blob-sas-uri)" "$BLOB_URI?$SAS_TOKEN"
   displayName: 'copy vhd sas to current subscription'
   enabled: true
