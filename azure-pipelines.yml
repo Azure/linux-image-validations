@@ -17,6 +17,7 @@ steps:
     TARGET_SAS_TOKEN=$(az storage account generate-sas --permissions clrwapud --account-name tuximagestore --services bfqt --resource-types sco --expiry $end -o tsv)
     wget https://aka.ms/downloadazcopy-v10-linux -O azcopy.tar.gz && tar -C /tmp -xvzf azcopy.tar.gz
     /tmp/azcopy_linux_*/azcopy copy "$(blob-sas-uri)" "$TARGET_BLOB_URI?$TARGET_SAS_TOKEN"
+    cat /home/vsts/.azcopy/*.log
   displayName: 'Setting up VHD availability from PROD Subscription to TEST (Optional)'
   enabled: true
 
