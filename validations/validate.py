@@ -1,5 +1,6 @@
 from image_validator.pkgmgr.common import get_package_manager_info
 from image_validator.system import sysinfo, get_sysinfo
+from image_validator.os_information.grub_info import get_grub_parameters
 from datetime import datetime as dt
 import json
 import os
@@ -32,6 +33,7 @@ if __name__ == "__main__":
 
     get_sysinfo()
     release_notes["systemInformation"] = sysinfo
+    release_notes["grubParameters"] = get_grub_parameters()
     release_notes["version"] = "1.0.0"
     release_notes["name"] = "ImageBuild Validator"
     release_notes["date"] = str(dt.now())
