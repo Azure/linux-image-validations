@@ -15,7 +15,7 @@ def package_manager_validation():
     except ImportError:
         try:
             import dnf
-            from image_validator.pkgmgr.Yum import YumValidation
+            from image_validator.pkgmgr.dnf import dnfValidation
             package_manager = dnfValidation()
         except ImportError:
             return dict()
