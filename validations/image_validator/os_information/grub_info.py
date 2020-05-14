@@ -1,19 +1,19 @@
 import re
 
 def get_grub_parameters():
-    grubParametersFile = open("/etc/default/grub", "r")
+    grub_parameters_file = open("/etc/default/grub", "r")
 
-    grubParameters = {}
+    grub_parameters = {}
     
-    for line in grubParametersFile.readlines(): 
+    for line in grub_parameters_file.readlines(): 
         if(line.startswith('#')) :
             continue
 
         m = re.search('([a-zA-Z_]+)=(.+)', line)
         if m:
-            grubParameters[m.group(1)] = m.group(2)
+            grub_parameters[m.group(1)] = m.group(2)
     
-    return grubParameters
+    return grub_parameters
 
 if __name__ == "__main__":
     print(get_grub_parameters())
