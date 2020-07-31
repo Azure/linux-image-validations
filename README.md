@@ -24,7 +24,7 @@ Use this script/pipeline to check if your custom linux image (Vhd) built works o
    2. [Feature Request, Issue and Bug Reporting](#issue-and-bug-reporting)
    3. [Code Optimizations / Enhancements](#code-enhancements)
    4. [Microsoft OpenSource code of conduct](#code-of-conduct)
-6. Maintainers
+6. [Maintainers](#maintainers)
 
    
 
