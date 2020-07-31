@@ -4,9 +4,9 @@ Use this script/pipeline to check if your custom linux image (Vhd) built works o
 # Table of Contents
 1. [Motivation](#motivation)
 2. [Requirements](#requirements)
-   1. Linux / MacOS / Windows
-   2. Azure Pipelines
-   3. Azure Cloud Shell 
+   1. [Linux / macOS / Windows](#linux--macos--windows)
+   2. [Azure Pipelines](#azure-pipelines)
+   3. [Azure Cloud Shell](#azure-cloud-shell) 
 3. [Installation](#installation)
 4. [Working](#working)
    1. [Setup](#setup)
@@ -38,7 +38,7 @@ This can also be used by Support teams across and outside Microsoft to validate 
 images using [Azure Cloud Shell](https://shell.azure.com)
 
 ## Requirements
-### Linux / MacOS / Windows
+### Linux / macOS / Windows
 1. [Terraform](https://www.terraform.io)
    1. [Azure Provider](https://www.terraform.io/docs/providers/azurerm/index.html)
 2. Azure Account
@@ -46,7 +46,7 @@ images using [Azure Cloud Shell](https://shell.azure.com)
    2. Currently AAD Application ID and Client Secret is Supported
    3. Ensure that Azure App has contributor access
 
-### AzurePipelines Customer
+### Azure Pipelines
 1. Ensure that Terraform is available on Azure pipeline
 2. Ensure that relevant pipeline variables are set
 
@@ -91,7 +91,7 @@ All requirements are met
    cd linux-image-validations/azure
    terraform apply
    ```
-   2. Cleanup of Reosurces
+   2. Cleanup of Resources
    ```
    cd linux-image-validations/azure
    terraform destroy
