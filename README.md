@@ -51,7 +51,7 @@ images using [Azure Cloud Shell](https://shell.azure.com)
 2. Ensure that relevant pipeline variables are set
 
 ### Azure Cloud Shell
-All requirements are met
+All requirements are met. Terraform is already installed by default.
 
 ## Installation
 1. Ensure that [Requirements](#requirements) is met
