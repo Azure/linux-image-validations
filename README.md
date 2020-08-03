@@ -617,7 +617,7 @@ Short one-liner issue statement
 
 [Description]
 Provide Detailed Description explaining the issue statement
-Add Screenshots / Snippets / Error messages if necessary
+Add Screenshots / Snippets / Error messages if available
 
 [Steps to Reproduce]
 
