@@ -135,7 +135,7 @@ The output details are currently available in logs.json
 3. Instance Metadata Service (IMDS)
 
 #### Example
-[JSON Output](https://github.com/Azure/linux-image-validations/blob/7ff0fc156f0366870c3e43e66859b80359bff430/samples/output/rhel_ouput.json#L1-L433){:target="_blank"}
+![JSON Output](https://github.com/Azure/linux-image-validations/blob/7ff0fc156f0366870c3e43e66859b80359bff430/samples/output/rhel_ouput.json#L1-L433)
 
 ### Validations
 #### Current Validations Performed
