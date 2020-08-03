@@ -20,8 +20,8 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Screenshots / Snippets / Logs / Attachments**
+If applicable, add Screenshots / Snippets / Logs / Attachments in .zip to help explain your problem.
 
 **Environment (please complete the following information):**
 Windows / Linux / macOS
