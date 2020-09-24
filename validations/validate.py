@@ -2,6 +2,7 @@ from image_validator.pkgmgr.common import get_package_manager_info
 from image_validator.system import sysinfo, get_sysinfo
 from image_validator.os_information.grub_info import get_grub_parameters
 from datetime import datetime as dt
+from image_validator.ASR.loaddriver import invoke_load_driver
 import json
 import os
 import socket
@@ -38,6 +39,7 @@ if __name__ == "__main__":
     release_notes["name"] = "ImageBuild Validator"
     release_notes["date"] = str(dt.now())
     release_notes["hostname"] = socket.gethostname()
+    release_notes["ASR"] = invoke_load_driver()
 
     try:
         release_notes["generation"] = release_notes["hostname"].split('-')[-1]
