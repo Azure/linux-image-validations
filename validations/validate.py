@@ -47,5 +47,5 @@ if __name__ == "__main__":
     except:
         pass
 
-    with open("logs.json", 'w') as f:
+    with open("/tmp/logs.json", 'w') as f:
         f.write(json.dumps(release_notes, indent=4))
