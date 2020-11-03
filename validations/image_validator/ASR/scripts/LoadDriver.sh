@@ -54,9 +54,9 @@ case $OS in
 esac
 
 echo "Downloading the driver $drvName"
-wget https://https://rheldriverssa.blob.core.windows.net/involflt-`tr [A-Z] [a-z] <<< $OS`/$drvName
+wget https://rheldriverssa.blob.core.windows.net/involflt-`tr [A-Z] [a-z] <<< $OS`/$drvName
 if [ ! -e "$drvName" ]; then
-    echo "Downloading of $drvName from https://v2agqldevsa.blob.core.windows.net/involflt-`tr [A-Z] [a-z] <<< $OS`/$drvName failed"
+    echo "Downloading of $drvName from https://rheldriverssa.blob.core.windows.net/involflt-`tr [A-Z] [a-z] <<< $OS`/$drvName failed"
     exit 1
 fi
 
