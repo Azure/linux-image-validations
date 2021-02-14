@@ -1,16 +1,26 @@
 IMAGE_NAME=$1
 CURRENT_EPOCH=$2
 VALIDATION_TIME=$3
-VALIDATION_RESULT=$4
+#VALIDATION_RESULT=$4
 
-AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=pbasnalimagestore;AccountKey=wOBm+H8CSesHdDMMWi15bC82rAqLhQdXOMLB7MROIQajp2SQoPFwt1rF/S/QMc+JCAEt5+GK5t6MSD29LKyZJw==;EndpointSuffix=core.windows.net"
+AZURE_STORAGE_CONNECTION_STRING="<connection_string>"
 CONTAINER_NAME="imagevalidations"
 ACCOUNT_NAME="pbasnalimagestore"
 TABLE_NAME="imagevalidationstatus"
 
+VALIDATION_RESULT="Success"
+files=$(find ./validation_results -maxdepth 5 -type f | grep "/err/")
+for filename in $files; do
+    # not empty
+    if [ -s $filename ]; then
+        VALIDATION_RESULT="Failed"
+        break
+    fi
+done
 
-python create_image_entries.py \
-    -c  $AZURE_STORAGE_CONNECTION_STRING \
+python azure-table-data.py \
+    -m "insert_data" \
+    -c $AZURE_STORAGE_CONNECTION_STRING \
     -n $CONTAINER_NAME \
     -t $TABLE_NAME \
     -i $IMAGE_NAME \

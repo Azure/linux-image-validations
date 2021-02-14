@@ -36,24 +36,25 @@ class AzureTableData:
                 # add it to the list to be validated
                 if image.PartitionKey == image_name and image.ValidationResult is 'Success':
                     if (current_date_time - image.Timestamp).days > 2:
-                        list_of_images_to_validate.append(image_name)
+                        list_of_images_to_validate.append(line)
 
                     image_entry_exists = True
                     break
 
             if not image_entry_exists:
-                list_of_images_to_validate.append(image_name)
+                list_of_images_to_validate.append(line)
 
                 ## insert the entry as well
                 args.image_name = image_name
                 args.validation_result = 'NA'
                 self.insert_data(args)
 
-        print(list_of_images_to_validate)
+        # print("list to validate")
+        # print(list_of_images_to_validate)
 
         with open(args.filtered_image_list, 'w') as filteredimagefile:
             for image in list_of_images_to_validate:
-                filteredimagefile.write("%s\n" % image)
+                filteredimagefile.write("%s" % image)
 
     def insert_data(self, args):
         table_name = args.table_name # os.getenv('TABLE_NAME')

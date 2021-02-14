@@ -4,71 +4,71 @@
     - azure.azcollection
   
   pre_tasks:
-    # - name: Generate image list for validation and Initialize table storage
-    #   shell: |
-    #     . ./set-env-vars.sh
-    #     python create_image_entries.py \
-    #       -m "select-images-to-validate" \
-    #       -c "{{ lookup('env', 'AZURE_STORAGE_CONNECTION_STRING') }}" \
-    #       -t "{{ lookup('env', 'TABLE_NAME') }}" \
-    #       -e "1" \
-    #       -in allimages \
-    #       -out filteredimages
-
     - set_fact:
-        marketplace_images: "{{ lookup('file', 'file/filteredimages').split() }}"
-        rhui_regions: "{{ lookup('file', 'file/rhui-regions').split() }}"
-
-    - debug:
-        var: marketplace_images
+        marketplace_images: "{{ lookup('file', 'files/filteredimages').split() }}"
 
     - name: "Create VMs of the URNs from imagelist"
-      include_tasks: create-new-hosts.yaml
+      include_tasks: vm-playbooks/create-new-hosts.yaml
       loop: "{{ marketplace_images }}"
       when: item != ""
+
 
 - hosts: just_created
   gather_facts: False
   remote_user: azlinux
   become: true
   tasks:
+    - set_fact:
+        rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
+
     - name: Run per region validations
-      include_tasks: per-region-validation.yaml
+      include_tasks: validation-playbooks/per-region-validation.yaml
       loop: "{{ rhui_regions }}"
       when: item != ""
 
-    ## ########################################################################## 
-    ## below python script generates a logs.json which contains a lot of 
-    ## information about the host. Currently we don't have the code to 
-    ## parse that and decide if it is success or failure. Once that part is done,
-    ## uncomment the code below.
+#     ## ########################################################################## 
+#     ## below python script generates a logs.json which contains a lot of 
+#     ## information about the host. Currently we don't have the code to 
+#     ## parse that and decide if it is success or failure. Once that part is done,
+#     ## uncomment the code below.
 
-    # Run the validate.py script
-    # - name: Copy validation python scripts to host
-    #   copy: src=./validations/ dest=/tmp/validations/
+#     # Run the validate.py script
+#     # - name: Copy validation python scripts to host
+#     #   copy: src=./validations/ dest=/tmp/validations/
 
-    # - name: Run validation script
-    #   shell: python /tmp/validations/validate.py
-    ## ##########################################################################
+#     # - name: Run validation script
+#     #   shell: python /tmp/validations/validate.py
+#     ## ##########################################################################
 
-    - name: List all the log files
-      shell: (cd /tmp; find . -maxdepth 1 -type f) | cut -d'/' -f2
-      register: files_to_copy
-      
+    - name: Recursively find /tmp/out files
+      find:
+        paths: /tmp/out
+        recurse: yes
+      register: out_files_to_copy
+
+    - name: Recursively find /tmp/err files
+      find:
+        paths: /tmp/err
+        recurse: yes
+      register: err_files_to_copy
+
+    - name: Merge the two lists
+      set_fact:
+        files_list: "{{ out_files_to_copy.files + err_files_to_copy.files }}"
+
     - name: Fetch all the log files
       fetch: 
-        src: /tmp/{{ item }} 
+        src: "{{ item.path }}"
         dest: ./validation_results
-      with_items: "{{ files_to_copy.stdout_lines }}"
-
+      loop: "{{ files_list }}"
 
 - hosts: localhost
   tasks:
     - name: "Upload all the log files to storage"
       include_tasks: upload-logs.yaml
-      loop: "{{ lookup('dict', hostvars) }}"
+      loop: "{{ groups['just_created'] }}"
     
-    # - name: Remove VMs created for validation
-    #   include_tasks: create-new-hosts.yaml
-    #   loop: "{{ marketplace_images }}"
-    #   when: item != ""
+    - name: Remove VMs created for validation
+      include_tasks: vm-playbooks/remove-vm.yaml
+      loop: "{{ marketplace_images }}"
+      when: item != ""
