@@ -1,0 +1,56 @@
+---
+- set_fact:
+    hostname: "{{ item.key }}"
+    hostip: "{{ item.value.ansible_host }}"
+    current_time: "{{ ansible_date_time.iso8601 }}"
+    current_epoch: "{{ ansible_date_time.epoch }}"
+
+- name: Read error file
+  shell: "cat ./validation_results/{{ hostname }}/tmp/yumrepolist_err.log"
+  register: errfileout
+- name: Read output file
+  shell: "cat ./validation_results/{{ hostname }}/tmp/yumrepolist_out.log"
+  register: outputfileout
+
+# - debug:
+#     msg: "./validation_results/{{ hostname }}/tmp/yumrepolist_err.log"
+
+- name: Upload yum repolist errors file to storage account
+  azure_rm_storageblob:
+    resource_group: pbasnal-rg
+    storage_account_name: pbasnalimagestore
+    container: imagevalidations
+    blob: "{{ hostname }}/yumrepolist_err.log"
+    src: "./validation_results/{{ hostname }}/tmp/yumrepolist_err.log"
+    public_access: container
+    tags:
+      validation_time: "{{ current_time }}"
+    force: yes 
+  when: errfileout.stdout != ""
+
+- name: Upload yum repolist output file to storage account
+  azure_rm_storageblob:
+    resource_group: pbasnal-rg
+    storage_account_name: pbasnalimagestore
+    container: imagevalidations
+    blob: "{{ hostname }}/yumrepolist_out.log"
+    src: "./validation_results/{{ hostname }}/tmp/yumrepolist_out.log"
+    public_access: container
+    tags:
+      validation_time: "{{ current_time }}"
+    force: yes 
+  when: outputfileout.stdout != ""
+
+
+- name: Set validation status as failed if the err file is not empty
+  set_fact:
+    validation_result: "Failed"
+  when: errfileout.stdout != ""
+
+- name: Set validation status as success if the err file is not empty
+  set_fact:
+    validation_result: "Success"
+  when: errfileout.stdout == ""
+
+- name: Create table entry
+  shell: "./set_validation_results.sh {{hostname}} {{ current_epoch }} {{current_time}} {{validation_result}}"

@@ -1,0 +1,15 @@
+---
+- name: Set image properties
+  set_fact:
+    region_ip: "{{ item }}"
+
+- name: Set /etc/hosts for a failure
+  copy:
+    dest: "/etc/hosts"
+    content: |
+      127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+      ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+      "{{ region_ip }}   rhui-1.microsoft.com rhui-2.microsoft.com rhui-3.microsoft.com"
+
+- name: "Run Yum Repolist"
+  shell: "yum clean all && yum repolist > /tmp/{{ region_ip }}yumrepolist_out.log 2> /tmp/{{ region_ip }}yumrepolist_err.log"

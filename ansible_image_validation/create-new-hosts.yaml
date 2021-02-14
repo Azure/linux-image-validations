@@ -1,0 +1,41 @@
+---
+- name: Set image properties
+  set_fact:
+    publisher: "{{ item.split(':')[0] }}"
+    offer: "{{ item.split(':')[1] }}"
+    sku: "{{ item.split(':')[2] }}"
+    version: "{{ item.split(':')[3] }}"
+    ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+- name: Set VM name variable
+  set_fact:
+    vmname: "{{ offer }}-{{ sku }}-{{ version }}"
+    
+- name: Create VM
+  azure_rm_virtualmachine:
+    resource_group: pbasnal-rg
+    name: "{{ vmname }}"
+    admin_username: azlinux
+    admin_password: Welcome@1234
+    #location: westindia
+    #virtual_network_name: pbasnal-rg-vnet
+    #subnet_name: default
+    ssh_public_keys:
+      - path: /home/azlinux/.ssh/authorized_keys
+        key_data: "{{ ssh_pub_key }}"
+    vm_size: Standard_B1ms
+    image:
+      offer: "{{ offer }}"
+      publisher: "{{ publisher }}"
+      sku: "{{ sku }}"
+      version: "{{ version }}"
+  register: azurevm
+  
+- set_fact:
+    azurevm_privateip: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+
+- name: Add the new VM to in-memory inventory
+  add_host:
+    hostname: '{{ vmname }}'
+    groups: just_created
+    ansible_host: "{{ azurevm_privateip }}"

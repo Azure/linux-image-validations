@@ -1,0 +1,1 @@
+az vm image list --all --publisher redhat | grep urn | cut -d'"' -f4 > files/allimages

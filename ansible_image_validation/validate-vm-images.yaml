@@ -1,0 +1,74 @@
+- hosts: localhost
+  gather_facts: False
+  collections:
+    - azure.azcollection
+  
+  pre_tasks:
+    # - name: Generate image list for validation and Initialize table storage
+    #   shell: |
+    #     . ./set-env-vars.sh
+    #     python create_image_entries.py \
+    #       -m "select-images-to-validate" \
+    #       -c "{{ lookup('env', 'AZURE_STORAGE_CONNECTION_STRING') }}" \
+    #       -t "{{ lookup('env', 'TABLE_NAME') }}" \
+    #       -e "1" \
+    #       -in allimages \
+    #       -out filteredimages
+
+    - set_fact:
+        marketplace_images: "{{ lookup('file', 'file/filteredimages').split() }}"
+        rhui_regions: "{{ lookup('file', 'file/rhui-regions').split() }}"
+
+    - debug:
+        var: marketplace_images
+
+    - name: "Create VMs of the URNs from imagelist"
+      include_tasks: create-new-hosts.yaml
+      loop: "{{ marketplace_images }}"
+      when: item != ""
+
+- hosts: just_created
+  gather_facts: False
+  remote_user: azlinux
+  become: true
+  tasks:
+    - name: Run per region validations
+      include_tasks: per-region-validation.yaml
+      loop: "{{ rhui_regions }}"
+      when: item != ""
+
+    ## ########################################################################## 
+    ## below python script generates a logs.json which contains a lot of 
+    ## information about the host. Currently we don't have the code to 
+    ## parse that and decide if it is success or failure. Once that part is done,
+    ## uncomment the code below.
+
+    # Run the validate.py script
+    # - name: Copy validation python scripts to host
+    #   copy: src=./validations/ dest=/tmp/validations/
+
+    # - name: Run validation script
+    #   shell: python /tmp/validations/validate.py
+    ## ##########################################################################
+
+    - name: List all the log files
+      shell: (cd /tmp; find . -maxdepth 1 -type f) | cut -d'/' -f2
+      register: files_to_copy
+      
+    - name: Fetch all the log files
+      fetch: 
+        src: /tmp/{{ item }} 
+        dest: ./validation_results
+      with_items: "{{ files_to_copy.stdout_lines }}"
+
+
+- hosts: localhost
+  tasks:
+    - name: "Upload all the log files to storage"
+      include_tasks: upload-logs.yaml
+      loop: "{{ lookup('dict', hostvars) }}"
+    
+    # - name: Remove VMs created for validation
+    #   include_tasks: create-new-hosts.yaml
+    #   loop: "{{ marketplace_images }}"
+    #   when: item != ""
