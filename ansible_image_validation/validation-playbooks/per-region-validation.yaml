@@ -1,0 +1,30 @@
+---
+- name: Set image properties
+  set_fact:
+    region_name: "{{ item.split(':')[0] }}"
+    region_ip: "{{ item.split(':')[1] }}"
+    out_folder: /tmp/out
+    err_folder: /tmp/err
+    yum_out_file: yumrepolist_out.log
+    yum_err_file: yumrepolist_err.log
+
+- name: Set /etc/hosts for a failure
+  copy:
+    dest: "/etc/hosts"
+    content: |
+      127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+      ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+      "{{ region_ip }}   rhui-1.microsoft.com rhui-2.microsoft.com rhui-3.microsoft.com"
+
+- name: Create yum err directory
+  file:
+    path: "{{ out_folder }}/{{ region_name}}"
+    state: directory
+
+- name: Create yum err directory
+  file:
+    path: "{{ err_folder }}/{{ region_name}}"
+    state: directory
+
+- name: Run Yum Repolist
+  shell: "yum clean all && yum repolist > {{out_folder}}/{{region_name}}/{{ yum_out_file }} 2> {{err_folder}}/{{region_name}}/{{ yum_err_file }}"

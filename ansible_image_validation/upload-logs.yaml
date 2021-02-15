@@ -1,0 +1,30 @@
+---
+- set_fact:
+    hostname: "{{ item }}"
+    current_time: "{{ ansible_date_time.iso8601 }}"
+    current_epoch: "{{ ansible_date_time.epoch }}"
+    resource_group: "{{ lookup('env', 'RESOURCE_GROUP') }}"
+    storage_account_name: "{{ lookup('env', 'ACCOUNT_NAME') }}"
+    container_name: "{{ lookup('env', 'CONTAINER_NAME') }}"
+
+- name: Recursively find all the log files
+  find:
+    paths: "./validation_results/{{ hostname }}"
+    recurse: yes
+  register: logfiles
+
+- name: Upload yum repolist errors file to storage account
+  azure_rm_storageblob:
+    resource_group: "{{ resource_group }}"
+    storage_account_name: "{{ storage_account_name }}"
+    container: "{{ container_name }}"
+    blob: "{{ hostname }}{{ item.path.split('tmp')[1] }}"
+    src: "{{ item.path }}"
+    public_access: container
+    tags:
+      validation_time: "{{ current_time }}"
+    force: yes 
+  loop: "{{ logfiles.files }}"
+
+- name: Create table entry
+  shell: "./set_validation_results.sh {{hostname}} {{ current_epoch }} {{current_time}}"

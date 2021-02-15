@@ -1,0 +1,77 @@
+- hosts: localhost
+  gather_facts: False
+  collections:
+    - azure.azcollection
+  
+  tasks:
+    - name: Load configurations from ./configurations/set-env-configs.sh
+      shell: . ./configurations/set-env-configs.sh
+
+    - set_fact:
+        marketplace_images: "{{ lookup('file', 'files/filteredimages').split() }}"
+
+    - name: "Create VMs of the URNs from imagelist"
+      include_tasks: vm-playbooks/create-new-hosts.yaml
+      loop: "{{ marketplace_images }}"
+      when: item != ""
+
+- hosts: just_created
+  gather_facts: False
+  remote_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
+  become: true
+  tasks:
+    - set_fact:
+        rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
+
+    - name: Run per region validations
+      include_tasks: validation-playbooks/per-region-validation.yaml
+      loop: "{{ rhui_regions }}"
+      when: item != ""
+      ignore_errors: yes
+
+    ## ########################################################################## 
+    ## below python script generates a logs.json which contains a lot of 
+    ## information about the host. Currently we don't have the code to 
+    ## parse that and decide if it is success or failure. Once that part is done,
+    ## uncomment the code below.
+
+    # Run the validate.py script
+    # - name: Copy validation python scripts to host
+    #   copy: src=./validations/ dest=/tmp/validations/
+
+    # - name: Run validation script
+    #   shell: python /tmp/validations/validate.py
+    ## ##########################################################################
+
+    - name: Recursively find /tmp/out files
+      find:
+        paths: /tmp/out
+        recurse: yes
+      register: out_files_to_copy
+
+    - name: Recursively find /tmp/err files
+      find:
+        paths: /tmp/err
+        recurse: yes
+      register: err_files_to_copy
+
+    - name: Merge the two lists
+      set_fact:
+        files_list: "{{ out_files_to_copy.files + err_files_to_copy.files }}"
+
+    - name: Fetch all the log files
+      fetch: 
+        src: "{{ item.path }}"
+        dest: ./validation_results
+      loop: "{{ files_list }}"
+
+- hosts: localhost
+  tasks:
+    - name: "Upload all the log files to storage"
+      include_tasks: upload-logs.yaml
+      loop: "{{ groups['just_created'] }}"
+    
+    - name: Remove VMs created for validation
+      include_tasks: vm-playbooks/remove-vm.yaml
+      loop: "{{ marketplace_images }}"
+      when: item != ""

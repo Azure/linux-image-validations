@@ -1,0 +1,10 @@
+Loaded plugins: langpacks, product-id, search-disabled-repos
+repo id                                                   repo name       status
+rhui-microsoft-azure-rhel7                                Microsoft Azure     2
+rhui-rhel-7-server-dotnet-rhui-rpms/x86_64                dotNET on RHEL    627
+rhui-rhel-7-server-rhui-extras-rpms/x86_64                Red Hat Enterpr  1351
+rhui-rhel-7-server-rhui-rh-common-rpms/7Server/x86_64     Red Hat Enterpr   243
+rhui-rhel-7-server-rhui-rpms/7Server/x86_64               Red Hat Enterpr 31416
+rhui-rhel-7-server-rhui-supplementary-rpms/7Server/x86_64 Red Hat Enterpr   395
+rhui-rhel-server-rhui-rhscl-7-rpms/7Server/x86_64         Red Hat Softwar 13104
+repolist: 47138

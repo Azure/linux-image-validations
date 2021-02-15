@@ -1,0 +1,43 @@
+---
+- name: Set image properties
+  set_fact:
+    publisher: "{{ item.split(':')[0] }}"
+    offer: "{{ item.split(':')[1] }}"
+    sku: "{{ item.split(':')[2] }}"
+    version: "{{ item.split(':')[3] }}"
+    ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    resource_group: "{{ lookup('env', 'RESOURCE_GROUP') }}"
+    storage_account_name: "{{ lookup('env', 'ACCOUNT_NAME') }}"
+    container_name: "{{ lookup('env', 'CONTAINER_NAME') }}"
+    admin_user_name: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
+    admin_password: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
+
+- name: Set VM name variable
+  set_fact:
+    vmname: "{{ offer | replace('_','-') }}-{{ sku | replace('_','-') }}-{{ version }}"
+    
+- name: Create VM
+  azure_rm_virtualmachine:
+    resource_group: "{{ resource_group }}"
+    name: "{{ vmname }}"
+    admin_username: "{{ admin_user_name }}"
+    admin_password: "{{ admin_password }}"
+    ssh_public_keys:
+      - path: "/home/{{ admin_user_name }}/.ssh/authorized_keys"
+        key_data: "{{ ssh_pub_key }}"
+    vm_size: Standard_B1ms
+    image:
+      offer: "{{ offer }}"
+      publisher: "{{ publisher }}"
+      sku: "{{ sku }}"
+      version: "{{ version }}"
+  register: azurevm
+  
+- set_fact:
+    azurevm_privateip: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+
+- name: Add the new VM to in-memory inventory
+  add_host:
+    hostname: '{{ vmname }}'
+    groups: just_created
+    ansible_host: "{{ azurevm_privateip }}"

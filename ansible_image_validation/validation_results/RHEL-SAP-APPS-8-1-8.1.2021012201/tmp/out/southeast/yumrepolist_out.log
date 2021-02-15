@@ -1,0 +1,8 @@
+repo id                                          repo name                status
+microsoft-azure-rhel8-eus                        Microsoft Azure RPMs for    1
+microsoft-azure-rhel8-sapapps                    Microsoft Azure RPMs for    3
+rhel-8-for-x86_64-appstream-eus-rhui-rpms        Red Hat Enterprise Linux 9120
+rhel-8-for-x86_64-baseos-eus-rhui-rpms           Red Hat Enterprise Linux 4148
+rhel-8-for-x86_64-highavailability-eus-rhui-rpms Red Hat Enterprise Linux  174
+rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms    Red Hat Enterprise Linux   15
+rhel-8-for-x86_64-sap-solutions-eus-rhui-rpms    Red Hat Enterprise Linux   13
