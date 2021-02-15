@@ -39,8 +39,8 @@ class AzureTableData:
                 if image.PartitionKey == image_name:
                     image_entry_exists = True
 
-                    if image.ValidationResult != 'Success' or (current_date_time - image.Timestamp).days > 4:
-                            list_of_images_to_validate.append(line)                    
+                    if image.ValidationResult == 'NA' or (current_date_time - image.Timestamp).days > 4:
+                        list_of_images_to_validate.append(line)                    
                     break
 
             if not image_entry_exists:
