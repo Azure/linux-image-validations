@@ -1,10 +1,9 @@
-export AZURE_STORAGE_CONNECTION_STRING="<connection_string>"
-export TABLE_NAME="imagevalidationstatus"
+## Set configurations
+. ./configurations/set-env-configs.sh
 
 # this will create the entries in the table storage
 # this will also generate the filtered image list for which 
 # validation should be performed
-
 python azure-table-data.py \
     -m "select-images-to-validate" \
     -c $AZURE_STORAGE_CONNECTION_STRING \
@@ -17,5 +16,3 @@ python azure-table-data.py \
 ## Copy logs to blob
 ## Update table storage entries
 ansible-playbook validate-vm-images.yaml
-
-#cat files/filteredimages

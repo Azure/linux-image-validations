@@ -1,12 +1,9 @@
 IMAGE_NAME=$1
 CURRENT_EPOCH=$2
 VALIDATION_TIME=$3
-#VALIDATION_RESULT=$4
 
-AZURE_STORAGE_CONNECTION_STRING="<connection_string>"
-CONTAINER_NAME="imagevalidations"
-ACCOUNT_NAME="pbasnalimagestore"
-TABLE_NAME="imagevalidationstatus"
+## Set configurations
+. ./configurations/set-env-configs.sh
 
 VALIDATION_RESULT="Success"
 files=$(find ./validation_results -maxdepth 5 -type f | grep "/err/")
