@@ -12,8 +12,8 @@ class AzureTableData:
 
     def select_images_to_validate(self, args):
         max_vms_to_validate_at_a_time = int(os.environ['MAX_VM_TO_VALIDATE'])
-        print("max vm", max_vms_to_validate_at_a_time)
-
+        validation_period_in_days = int(os.environ['VALIDATION_PERIOD_IN_DAYS'])
+        
         allimages = open(args.all_image_list, 'r')
         Lines = allimages.readlines()
         
@@ -39,7 +39,7 @@ class AzureTableData:
                 if image.PartitionKey == image_name:
                     image_entry_exists = True
 
-                    if image.ValidationResult == 'NA' or (current_date_time - image.Timestamp).days > 4:
+                    if image.ValidationResult == 'NA' or (current_date_time - image.Timestamp).days > validation_period_in_days:
                         list_of_images_to_validate.append(line)                    
                     break
 

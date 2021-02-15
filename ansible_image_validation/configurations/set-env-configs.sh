@@ -6,3 +6,4 @@ export MAX_VM_TO_VALIDATE=1
 export RESOURCE_GROUP="pbasnal-rg"
 export ADMIN_USER_NAME="azlinux"
 export ADMIN_PASSWORD="<password>"
+export VALIDATION_PERIOD_IN_DAYS=4
