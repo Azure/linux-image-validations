@@ -11,7 +11,8 @@ class AzureTableData:
         self.table_service = TableService(connection_string=connect_str)
 
     def select_images_to_validate(self, args):
-        max_vms_to_validate_at_a_time = os.environ['MAX_VM_TO_VALIDATE']
+        max_vms_to_validate_at_a_time = int(os.environ['MAX_VM_TO_VALIDATE'])
+        print("max vm", max_vms_to_validate_at_a_time)
 
         allimages = open(args.all_image_list, 'r')
         Lines = allimages.readlines()
@@ -29,7 +30,7 @@ class AzureTableData:
             sku = line.split(':')[2]
             disk_version = line.split(':')[3].replace('\n', '')
 
-            image_name = offer + "-" + sku + "-" + disk_version
+            image_name = offer.replace("_", "-") + "-" + sku.replace("_", "-") + "-" + disk_version
             
             image_entry_exists = False
             for image in entries:
@@ -52,10 +53,10 @@ class AzureTableData:
 
         i = 0
         with open(args.filtered_image_list, 'w') as filteredimagefile:
+            filteredimagefile.write("")
             for image in list_of_images_to_validate:
                 if i == max_vms_to_validate_at_a_time:
                     break
-
                 filteredimagefile.write("%s" % image)
                 i += 1
 

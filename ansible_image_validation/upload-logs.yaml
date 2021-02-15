@@ -7,9 +7,6 @@
     storage_account_name: "{{ lookup('env', 'ACCOUNT_NAME') }}"
     container_name: "{{ lookup('env', 'CONTAINER_NAME') }}"
 
-- debug:
-    msg: "{{resource_group}} {{storage_account_name}} {{container_name}}"
-
 - name: Recursively find all the log files
   find:
     paths: "./validation_results/{{ hostname }}"

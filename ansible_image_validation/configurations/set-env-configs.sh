@@ -1,4 +1,4 @@
-export AZURE_STORAGE_CONNECTION_STRING="<connection-string>"
+export AZURE_STORAGE_CONNECTION_STRING="<connection_string>"
 export TABLE_NAME="imagevalidationstatus"
 export CONTAINER_NAME="imagevalidations"
 export ACCOUNT_NAME="pbasnalimagestore"
