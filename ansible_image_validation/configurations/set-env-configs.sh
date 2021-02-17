@@ -1,9 +1,9 @@
-export AZURE_STORAGE_CONNECTION_STRING="<connection_string>"
+export AZURE_STORAGE_CONNECTION_STRING=""
 export TABLE_NAME="imagevalidationstatus"
 export CONTAINER_NAME="imagevalidations"
 export ACCOUNT_NAME="pbasnalimagestore"
-export MAX_VM_TO_VALIDATE=1
-export RESOURCE_GROUP="pbasnal-rg"
+export STORAGE_ACCOUNT_RESOURCE_GROUP="pbasnal-rg"
+export MAX_VM_TO_VALIDATE=3
+export RESOURCE_GROUP="pbasnal-rg2"
 export ADMIN_USER_NAME="azlinux"
-export ADMIN_PASSWORD="<password>"
-export VALIDATION_PERIOD_IN_DAYS=4
+export ADMIN_PASSWORD=""

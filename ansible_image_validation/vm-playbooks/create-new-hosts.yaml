@@ -16,6 +16,9 @@
   set_fact:
     vmname: "{{ offer | replace('_','-') }}-{{ sku | replace('_','-') }}-{{ version }}"
     
+- debug:
+    msg: "Creating VM - {{ vmname }}"
+
 - name: Create VM
   azure_rm_virtualmachine:
     resource_group: "{{ resource_group }}"
@@ -26,6 +29,7 @@
       - path: "/home/{{ admin_user_name }}/.ssh/authorized_keys"
         key_data: "{{ ssh_pub_key }}"
     vm_size: Standard_B1ms
+    virtual_network_name: "pb-rg2-vnet"
     image:
       offer: "{{ offer }}"
       publisher: "{{ publisher }}"

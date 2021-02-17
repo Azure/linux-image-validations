@@ -1,0 +1,18 @@
+---
+- name: Set image properties
+  set_fact:
+    err_folder: /tmp/err
+    admin_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
+
+- name: Check number of users on the machine
+  shell: getent passwd {1000..60000} | grep -v {{ admin_user }} | wc -l
+  register: users_on_machine
+  ignore_errors: yes
+
+- name: Write to error msg if repolist failed
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "Additional users found on the machines"
+    create: yes
+    state: present
+  when: users_on_machine.stdout_lines[0] != '0'

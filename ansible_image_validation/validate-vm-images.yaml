@@ -4,11 +4,11 @@
     - azure.azcollection
   
   tasks:
-    - name: Load configurations from ./configurations/set-env-configs.sh
-      shell: . ./configurations/set-env-configs.sh
-
     - set_fact:
         marketplace_images: "{{ lookup('file', 'files/filteredimages').split() }}"
+    
+    - name: Clean logs from pevious run
+      shell: rm -rf ./validation_results
 
     - name: "Create VMs of the URNs from imagelist"
       include_tasks: vm-playbooks/create-new-hosts.yaml
@@ -19,9 +19,21 @@
   gather_facts: False
   remote_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
   become: true
+
+  vars:
+    ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
+
   tasks:
     - set_fact:
         rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
+
+    - name: Delete validation data from previous run
+      shell: rm -rf /tmp/out && rm -rf /tmp/err
+      ignore_errors: yes
+
+    - name: Run per region validations
+      include_tasks: validation-playbooks/per-vm-validation.yaml
+      ignore_errors: yes
 
     - name: Run per region validations
       include_tasks: validation-playbooks/per-region-validation.yaml

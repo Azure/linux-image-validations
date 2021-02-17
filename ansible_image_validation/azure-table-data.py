@@ -2,6 +2,8 @@ import os
 import datetime 
 import dateutil.parser
 import argparse
+
+from os import path
 from azure.cosmosdb.table.tableservice import TableService
 from azure.cosmosdb.table.models import Entity
 
@@ -9,6 +11,63 @@ class AzureTableData:
     def __init__(self, args):
         connect_str = args.connection_str
         self.table_service = TableService(connection_string=connect_str)
+
+    def get_report_line(self, image, context):
+        result_line = "\t<tr class='" + context + "'>\n"
+
+        if hasattr(image, 'ErrorMessages'):
+            err_msg = str(image.ErrorMessages)
+        else:
+            err_msg = ""
+
+        result_line = result_line + "\t\t<td>" + str(image.PartitionKey) + "</td>\n"
+        result_line = result_line + "\t\t<td>" + str(image.ValidationResult) + "</td>\n"
+        result_line = result_line + "\t\t<td>" + err_msg + "</td>\n"
+
+        result_line = result_line + "\t</tr>\n"
+        return result_line
+        
+    def generate_validation_report(self, args):
+        imagequeryresult = self.table_service.query_entities(args.table_name, accept='application/json;odata=minimalmetadata')
+        current_date_time = datetime.datetime.now(datetime.timezone.utc)
+
+        result_line = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Marketplace Image Validation Report</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <table class="table">
+        <tr>
+            <td> VM Name </td>
+            <td> Validation Result </td>
+            <td> Error Messages </td>
+        </tr>\n"""
+        with open('./report/index.html', 'w') as report:
+            context = "danger"
+            for image in imagequeryresult:
+                if image.ValidationResult == "Failed":
+                    result_line = result_line + self.get_report_line(image, context)
+            
+            context = "success"
+            for image in imagequeryresult:
+                if image.ValidationResult == "Success":
+                    result_line = result_line + self.get_report_line(image, context)
+
+            context = "warning"
+            for image in imagequeryresult:
+                if image.ValidationResult == "NA":
+                    result_line = result_line + self.get_report_line(image, context)
+
+                
+            result_line = result_line + "</table></body></html>"
+            report.write("%s\n" % result_line)
+            
 
     def select_images_to_validate(self, args):
         max_vms_to_validate_at_a_time = int(os.environ['MAX_VM_TO_VALIDATE'])
@@ -65,10 +124,16 @@ class AzureTableData:
         validation_result = args.validation_result
         validation_epoch = args.validation_epoch
 
+        if path.exists(args.err_msg_file):
+            err_msgs = open(args.err_msg_file, "r").read()
+        else:
+            err_msgs = ""
+
         validationResult = {
             'PartitionKey': image_name,
             'RowKey': "1", 
-            'ValidationResult': validation_result
+            'ValidationResult': validation_result,
+            "ErrorMessages": err_msgs
         }
 
         print(validationResult)
@@ -88,6 +153,7 @@ def parse_arguments():
     parser.add_argument('--validation-epoch', '-e', help = "Epoch value at the time of validation")
     parser.add_argument('--validation-time', help = "Time of validation")
     parser.add_argument('--validation-result', help = "Validation result")
+    parser.add_argument('--err-msg-file', help = "File which contains error messages")
 
     parser.add_argument('--all-image-list', '-in', help = "connection string for the storage account")
     parser.add_argument('--filtered-image-list', '-out', help = "connection string for the storage account")
@@ -98,7 +164,9 @@ if __name__ == "__main__":
     args = parse_arguments()
     tabledata = AzureTableData(args)
 
-    if args.method == "insert_data":
+    if args.method == "insert-data":
         tabledata.insert_data(args)
     elif args.method == "select-images-to-validate":
         tabledata.select_images_to_validate(args)
+    elif args.method == "generate-report":
+        tabledata.generate_validation_report(args)
