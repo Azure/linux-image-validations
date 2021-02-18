@@ -16,7 +16,7 @@ class AzureTableData:
         result_line = "\t<tr class='" + context + "'>\n"
 
         if hasattr(image, 'ErrorMessages'):
-            err_msg = str(image.ErrorMessages)
+            err_msg = str(image.ErrorMessages).replace("\n", "</br>")
         else:
             err_msg = ""
 
