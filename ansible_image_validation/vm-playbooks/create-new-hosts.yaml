@@ -7,7 +7,7 @@
     version: "{{ item.split(':')[3] }}"
     ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
     resource_group: "{{ lookup('env', 'RESOURCE_GROUP') }}"
-    storage_account_name: "{{ lookup('env', 'ACCOUNT_NAME') }}"
+    vnet_name: "{{ lookup('env', 'HOST_VNET_NAME') }}"
     container_name: "{{ lookup('env', 'CONTAINER_NAME') }}"
     admin_user_name: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
     admin_password: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
@@ -29,7 +29,7 @@
       - path: "/home/{{ admin_user_name }}/.ssh/authorized_keys"
         key_data: "{{ ssh_pub_key }}"
     vm_size: Standard_B1ms
-    virtual_network_name: "pb-rg2-vnet"
+    virtual_network_name: "{{ vnet_name }}"
     image:
       offer: "{{ offer }}"
       publisher: "{{ publisher }}"

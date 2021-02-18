@@ -6,4 +6,5 @@ export STORAGE_ACCOUNT_RESOURCE_GROUP="pbasnal-rg"
 export MAX_VM_TO_VALIDATE=3
 export RESOURCE_GROUP="pbasnal-rg2"
 export ADMIN_USER_NAME="azlinux"
+export HOST_VNET_NAME="pb-rg2-vnet"
 export ADMIN_PASSWORD=""
