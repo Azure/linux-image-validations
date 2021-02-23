@@ -28,7 +28,9 @@ python azure-table-data.py \
     -e $CURRENT_EPOCH \
     --validation-time "$VALIDATION_TIME" \
     --validation-result $VALIDATION_RESULT \
-    --err-msg-file "./validation_results/$IMAGE_NAME/tmp/err/err_msgs.log"
+    --err-msg-file "./validation_results/$IMAGE_NAME/tmp/err/err_msgs.log" \
+    --max-vm-to-validate $MAX_VM_TO_VALIDATE \
+    --validation-period $VALIDATION_PERIOD
 
 python azure-table-data.py \
     -m "generate-report" \
@@ -39,4 +41,6 @@ python azure-table-data.py \
     -e $CURRENT_EPOCH \
     --validation-time "$VALIDATION_TIME" \
     --validation-result $VALIDATION_RESULT \
-    --err-msg-file "./validation_results/$IMAGE_NAME/tmp/err/err_msgs.log"
+    --err-msg-file "./validation_results/$IMAGE_NAME/tmp/err/err_msgs.log" \
+    --max-vm-to-validate $MAX_VM_TO_VALIDATE \
+    --validation-period $VALIDATION_PERIOD

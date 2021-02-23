@@ -12,7 +12,7 @@ class AzureTableData:
         connect_str = args.connection_str
         self.table_service = TableService(connection_string=connect_str)
 
-    def get_report_line(self, image, context):
+    def get_report_line(self, index, image, context):
         result_line = "\t<tr class='" + context + "'>\n"
 
         if hasattr(image, 'ErrorMessages'):
@@ -20,6 +20,7 @@ class AzureTableData:
         else:
             err_msg = ""
 
+        result_line = result_line + "\t\t<td>" + str(index) + "</td>\n"
         result_line = result_line + "\t\t<td>" + str(image.PartitionKey) + "</td>\n"
         result_line = result_line + "\t\t<td>" + str(image.ValidationResult) + "</td>\n"
         result_line = result_line + "\t\t<td>" + err_msg + "</td>\n"
@@ -31,6 +32,7 @@ class AzureTableData:
         imagequeryresult = self.table_service.query_entities(args.table_name, accept='application/json;odata=minimalmetadata')
         current_date_time = datetime.datetime.now(datetime.timezone.utc)
 
+        index = 1
         result_line = """
 <!DOCTYPE html>
 <html lang="en">
@@ -44,6 +46,7 @@ class AzureTableData:
 <body>
     <table class="table">
         <tr>
+            <td> # </td>
             <td> VM Name </td>
             <td> Validation Result </td>
             <td> Error Messages </td>
@@ -52,17 +55,20 @@ class AzureTableData:
             context = "danger"
             for image in imagequeryresult:
                 if image.ValidationResult == "Failed":
-                    result_line = result_line + self.get_report_line(image, context)
+                    result_line = result_line + self.get_report_line(index, image, context)
+                    index += 1
             
             context = "success"
             for image in imagequeryresult:
                 if image.ValidationResult == "Success":
-                    result_line = result_line + self.get_report_line(image, context)
+                    result_line = result_line + self.get_report_line(index, image, context)
+                    index += 1
 
             context = "warning"
             for image in imagequeryresult:
                 if image.ValidationResult == "NA":
-                    result_line = result_line + self.get_report_line(image, context)
+                    result_line = result_line + self.get_report_line(index, image, context)
+                    index += 1
 
                 
             result_line = result_line + "</table></body></html>"
@@ -70,7 +76,8 @@ class AzureTableData:
             
 
     def select_images_to_validate(self, args):
-        max_vms_to_validate_at_a_time = int(os.environ['MAX_VM_TO_VALIDATE'])
+        max_vms_to_validate_at_a_time = int(args.max_vm_to_validate ) #os.environ['MAX_VM_TO_VALIDATE'])
+        validation_period = int(args.validation_period)
 
         allimages = open(args.all_image_list, 'r')
         Lines = allimages.readlines()
@@ -96,7 +103,7 @@ class AzureTableData:
                 # add it to the list to be validated
                 if image.PartitionKey == image_name:
                     image_entry_exists = True
-                    if image.ValidationResult == 'NA' or (current_date_time - image.Timestamp).days > 4:
+                    if image.ValidationResult == 'NA' or (current_date_time - image.Timestamp).days > validation_period:
                             list_of_images_to_validate.append(line)                    
                     break
 
@@ -124,7 +131,8 @@ class AzureTableData:
         validation_result = args.validation_result
         validation_epoch = args.validation_epoch
 
-        if path.exists(args.err_msg_file):
+        print("error message path", args.err_msg_file)
+        if args.err_msg_file != None and path.exists(args.err_msg_file):
             err_msgs = open(args.err_msg_file, "r").read()
         else:
             err_msgs = ""
@@ -157,6 +165,9 @@ def parse_arguments():
 
     parser.add_argument('--all-image-list', '-in', help = "connection string for the storage account")
     parser.add_argument('--filtered-image-list', '-out', help = "connection string for the storage account")
+
+    parser.add_argument('--max-vm-to-validate', help = "Number of VMs to validate in a single run")
+    parser.add_argument('--validation-period', help = "Number of days to wait before validating a VM again")
 
     return parser.parse_args()
 

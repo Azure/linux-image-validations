@@ -25,6 +25,7 @@
     name: "{{ vmname }}"
     admin_username: "{{ admin_user_name }}"
     admin_password: "{{ admin_password }}"
+    managed_disk_type: Standard_LRS
     ssh_public_keys:
       - path: "/home/{{ admin_user_name }}/.ssh/authorized_keys"
         key_data: "{{ ssh_pub_key }}"
@@ -36,12 +37,16 @@
       sku: "{{ sku }}"
       version: "{{ version }}"
   register: azurevm
-  
+  ignore_errors: yes
+
 - set_fact:
     azurevm_privateip: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+  when: azurevm.failed == false
+  ignore_errors: yes
 
 - name: Add the new VM to in-memory inventory
   add_host:
     hostname: '{{ vmname }}'
     groups: just_created
     ansible_host: "{{ azurevm_privateip }}"
+  when: azurevm.failed == false

@@ -10,7 +10,9 @@ python azure-table-data.py \
     -t $TABLE_NAME \
     -e "1" \
     -in files/allimages \
-    -out files/filteredimages
+    -out files/filteredimages \
+    --max-vm-to-validate $MAX_VM_TO_VALIDATE \
+    --validation-period $VALIDATION_PERIOD
 
 ## This playbook will run validations
 ## Copy logs to blob

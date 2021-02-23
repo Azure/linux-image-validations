@@ -8,7 +8,7 @@
   shell: getent passwd {1000..60000} | grep -v {{ admin_user }} | wc -l
   register: users_on_machine
   ignore_errors: yes
-
+    
 - name: Write to error msg if repolist failed
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
