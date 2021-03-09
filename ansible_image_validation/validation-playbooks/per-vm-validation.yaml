@@ -5,6 +5,13 @@
     admin_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
 
 - name: Check number of users on the machine
+  shell: |
+    if [[ -L "/boot/grub2/grubenv" ]]; then   
+      echo "Grubenv file is symlink" >> {{err_folder}}/err_msgs.log
+    fi
+  ignore_errors: yes
+
+- name: Check number of users on the machine
   shell: getent passwd {1000..60000} | grep -v {{ admin_user }} | wc -l
   register: users_on_machine
   ignore_errors: yes
