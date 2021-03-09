@@ -7,7 +7,7 @@
     version: "{{ item.split(':')[3] }}"
     ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
     resource_group: "{{ lookup('env', 'RESOURCE_GROUP') }}"
-    storage_account_name: "{{ lookup('env', 'ACCOUNT_NAME') }}"
+    vnet_name: "{{ lookup('env', 'HOST_VNET_NAME') }}"
     container_name: "{{ lookup('env', 'CONTAINER_NAME') }}"
     admin_user_name: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
     admin_password: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
@@ -16,28 +16,37 @@
   set_fact:
     vmname: "{{ offer | replace('_','-') }}-{{ sku | replace('_','-') }}-{{ version }}"
     
+- debug:
+    msg: "Creating VM - {{ vmname }}"
+
 - name: Create VM
   azure_rm_virtualmachine:
     resource_group: "{{ resource_group }}"
     name: "{{ vmname }}"
     admin_username: "{{ admin_user_name }}"
     admin_password: "{{ admin_password }}"
+    managed_disk_type: Standard_LRS
     ssh_public_keys:
       - path: "/home/{{ admin_user_name }}/.ssh/authorized_keys"
         key_data: "{{ ssh_pub_key }}"
     vm_size: Standard_B1ms
+    virtual_network_name: "{{ vnet_name }}"
     image:
       offer: "{{ offer }}"
       publisher: "{{ publisher }}"
       sku: "{{ sku }}"
       version: "{{ version }}"
   register: azurevm
-  
+  ignore_errors: yes
+
 - set_fact:
     azurevm_privateip: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+  when: azurevm.failed == false
+  ignore_errors: yes
 
 - name: Add the new VM to in-memory inventory
   add_host:
     hostname: '{{ vmname }}'
     groups: just_created
     ansible_host: "{{ azurevm_privateip }}"
+  when: azurevm.failed == false

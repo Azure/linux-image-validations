@@ -42,3 +42,4 @@ override.tf.json
 logs.json
 
 */validation_results/*
+*/report/*

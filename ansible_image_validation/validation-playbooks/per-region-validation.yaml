@@ -8,13 +8,18 @@
     yum_out_file: yumrepolist_out.log
     yum_err_file: yumrepolist_err.log
 
-- name: Set /etc/hosts for a failure
+- name: Set /etc/hosts for a region
   copy:
     dest: "/etc/hosts"
     content: |
       127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
       ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-      "{{ region_ip }}   rhui-1.microsoft.com rhui-2.microsoft.com rhui-3.microsoft.com"
+      {{ region_ip }}   rhui-1.microsoft.com rhui-2.microsoft.com rhui-3.microsoft.com
+
+- name: Clean logs from pevious run
+  shell: |
+    rm -rf {{out_folder}}/{{ region_name}}
+    rm -rf {{err_folder}}/{{ region_name}}
 
 - name: Create yum err directory
   file:
@@ -27,4 +32,31 @@
     state: directory
 
 - name: Run Yum Repolist
-  shell: "yum clean all && yum repolist > {{out_folder}}/{{region_name}}/{{ yum_out_file }} 2> {{err_folder}}/{{region_name}}/{{ yum_err_file }}"
+  shell: |
+    touch {{err_folder}}/{{region_name}}/{{ yum_err_file }}
+    touch {{out_folder}}/{{region_name}}/{{ yum_out_file }}
+
+    yum clean all
+    yum repolist -v
+  register: yum_output
+  ignore_errors: yes
+
+- name: Write to error file if repolist failed
+  copy:
+    dest: "{{err_folder}}/{{region_name}}/{{ yum_err_file }}"
+    content: "{{yum_output.stderr}} {{yum_output.stdout}}"
+  when: yum_output.rc != 0
+
+- name: Write to error msg if repolist failed
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "Yum repolist failed for {{region_name}}"
+    create: yes
+    state: present
+  when: yum_output.rc != 0
+
+- name: Write to output file if repolist succeded
+  copy:
+    dest: "{{out_folder}}/{{region_name}}/{{ yum_out_file }}"
+    content: "{{yum_output.stderr}} {{yum_output.stdout}}"
+  when: yum_output.rc == 0

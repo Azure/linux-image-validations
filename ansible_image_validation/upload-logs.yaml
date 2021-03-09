@@ -6,6 +6,7 @@
     resource_group: "{{ lookup('env', 'RESOURCE_GROUP') }}"
     storage_account_name: "{{ lookup('env', 'ACCOUNT_NAME') }}"
     container_name: "{{ lookup('env', 'CONTAINER_NAME') }}"
+    sa_resource_group: "{{ lookup('env', 'STORAGE_ACCOUNT_RESOURCE_GROUP') }}"
 
 - name: Recursively find all the log files
   find:
@@ -15,7 +16,7 @@
 
 - name: Upload yum repolist errors file to storage account
   azure_rm_storageblob:
-    resource_group: "{{ resource_group }}"
+    resource_group: "{{ sa_resource_group }}"
     storage_account_name: "{{ storage_account_name }}"
     container: "{{ container_name }}"
     blob: "{{ hostname }}{{ item.path.split('tmp')[1] }}"
@@ -27,4 +28,6 @@
   loop: "{{ logfiles.files }}"
 
 - name: Create table entry
-  shell: "./set_validation_results.sh {{hostname}} {{ current_epoch }} {{current_time}}"
+  shell: |
+    ./set_validation_results.sh {{hostname}} {{ current_epoch }} {{current_time}}
+    az storage blob upload-batch --account-name {{storage_account_name}} -s ./report -d '$web'
