@@ -26,12 +26,24 @@
   tasks:
     - set_fact:
         rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
+        out_folder: /tmp/out
+        err_folder: /tmp/err
 
     - name: Delete validation data from previous run
       shell: rm -rf /tmp/out && rm -rf /tmp/err
       ignore_errors: yes
 
-    - name: Run per region validations
+    - name: Create yum err directory
+      file:
+        path: "{{ out_folder }}"
+        state: directory
+
+    - name: Create yum err directory
+      file:
+        path: "{{ err_folder }}"
+        state: directory
+
+    - name: Run per VM validations
       include_tasks: validation-playbooks/per-vm-validation.yaml
       ignore_errors: yes
 

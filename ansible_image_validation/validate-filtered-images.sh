@@ -1,4 +1,8 @@
 ## Set configurations
+CURR_DIR=$(pwd)
+BASEDIR=$(dirname "$0")
+cd $BASEDIR
+
 . ./configurations/set-env-configs.sh
 
 # this will create the entries in the table storage
@@ -17,4 +21,7 @@ python azure-table-data.py \
 ## This playbook will run validations
 ## Copy logs to blob
 ## Update table storage entries
-ansible-playbook validate-vm-images.yaml
+/home/pbasnal/.local/bin/ansible-playbook validate-vm-images.yaml
+
+cd $CURR_DIR
+
