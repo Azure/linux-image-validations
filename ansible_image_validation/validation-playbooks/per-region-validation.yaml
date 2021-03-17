@@ -35,6 +35,8 @@
   shell: |
     touch {{err_folder}}/{{region_name}}/{{ yum_err_file }}
     touch {{out_folder}}/{{region_name}}/{{ yum_out_file }}
+    
+    yum update -q -y --disablerepo='*' --enablerepo='*microsoft*'
 
     yum clean all
     yum repolist -v
