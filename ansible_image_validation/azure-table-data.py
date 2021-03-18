@@ -29,7 +29,9 @@ class AzureTableData:
         return result_line
         
     def generate_validation_report(self, args):
-        imagequeryresult = self.table_service.query_entities(args.table_name, accept='application/json;odata=minimalmetadata')
+        imagequeryresult = self.table_service.query_entities(args.table_name,
+            filter="IsDeleted eq '0'",
+            accept='application/json;odata=minimalmetadata')
         current_date_time = datetime.datetime.now(datetime.timezone.utc)
 
         index = 1
@@ -82,7 +84,10 @@ class AzureTableData:
         allimages = open(args.all_image_list, 'r')
         Lines = allimages.readlines()
         
-        imagequeryresult = self.table_service.query_entities(args.table_name, accept='application/json;odata=minimalmetadata')
+        imagequeryresult = self.table_service.query_entities(args.table_name,
+            filter="IsDeleted eq '0'",
+            accept='application/json;odata=minimalmetadata')
+
         entries = []
         list_of_images_to_validate = []
         current_date_time = datetime.datetime.now(datetime.timezone.utc)
@@ -141,7 +146,8 @@ class AzureTableData:
             'PartitionKey': image_name,
             'RowKey': "1", 
             'ValidationResult': validation_result,
-            "ErrorMessages": err_msgs
+            "ErrorMessages": err_msgs,
+            "IsDeleted": "0"
         }
 
         print(validationResult)

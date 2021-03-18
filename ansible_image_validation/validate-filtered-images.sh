@@ -3,6 +3,8 @@ CURR_DIR=$(pwd)
 BASEDIR=$(dirname "$0")
 cd $BASEDIR
 
+echo "" > /var/log/validation.log 
+
 . ./configurations/set-env-configs.sh
 
 # this will create the entries in the table storage

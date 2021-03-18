@@ -1,4 +1,8 @@
 ---
+- name: Debug input parameter
+  debug:
+    msg: "{{ item.split(':')[0] }} {{ item.split(':')[1] }} {{ item.split(':')[2] }} {{ item.split(':')[3] }}" 
+
 - name: Set image properties
   set_fact:
     publisher: "{{ item.split(':')[0] }}"

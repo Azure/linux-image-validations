@@ -18,5 +18,5 @@
   azure_rm_virtualmachine:
     resource_group: "{{ resource_group }}"
     name: "{{ vmname }}"
-    remove_on_absent: all_autocreated
+    remove_on_absent: all
     state: absent
