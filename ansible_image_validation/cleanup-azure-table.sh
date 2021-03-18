@@ -4,4 +4,4 @@
 python cleanup-azure-table.py \
     -c $AZURE_STORAGE_CONNECTION_STRING \
     -t $TABLE_NAME \
-    -in "allimages.tmp" 
+    -in "files/allimages" 
