@@ -9,19 +9,26 @@ from azure.cosmosdb.table.models import Entity
 from azure.cosmosdb.table.tablebatch import TableBatch
 
 class AzureTableData:
+    """
+    This class handles the functionality of getting data from
+    Azure Table Storage cleaning it.
+    """
     def __init__(self, args):
         connect_str = args.connection_str
         self.table_service = TableService(connection_string=connect_str)
 
     def clean_up_table(self, args):
-
+        """
+        Fetches all the images from Azure Table Storage.
+        Marks the images as deleted if the image is not present
+        in Azure Marketplace
+        """
         allimages = open(args.all_image_list, 'r')
         images_in_marketplace = allimages.readlines()
         
         imagequeryresult = self.table_service.query_entities(args.table_name, 
             filter="IsDeleted eq 0",
             accept='application/json;odata=minimalmetadata')
-
         
         print("Creating list of images")
         list_of_images_to_clean_up = []
@@ -30,14 +37,15 @@ class AzureTableData:
             
             l = [image_name for image_name in images_in_marketplace if disk_version in image_name]
             if l == None or len(l) is 0:
-                #print(image.PartitionKey, disk_version)
                 list_of_images_to_clean_up.append(image)            
 
-        #print(list_of_images_to_clean_up)
         print("Updating", len(list_of_images_to_clean_up))
         self.mark_deleted(list_of_images_to_clean_up, args.table_name)
 
     def mark_deleted(self, images, table_name):
+        """
+        Updates Azure Table Storage record by marking it as deleted
+        """
         i = 1
         for image in images:
             image.IsDeleted = 1

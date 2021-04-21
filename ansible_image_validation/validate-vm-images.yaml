@@ -1,3 +1,10 @@
+###
+# This Playbook orchestrate creation, validation, report generation
+# and upload of validation logs.
+###
+---
+## This section creates the VMs which should get validated
+## And then adds them to an ansible host group 'just_created'
 - hosts: localhost
   gather_facts: False
   collections:
@@ -15,6 +22,8 @@
       loop: "{{ marketplace_images }}"
       when: item != ""
 
+## This section takes the ansible host group 'just_created'
+## and runs validations against them
 - hosts: just_created
   gather_facts: False
   remote_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
@@ -89,6 +98,8 @@
         dest: ./validation_results
       loop: "{{ files_list }}"
 
+## This section uploads all the validation logs generated for all
+## the VMs to a configured storage account
 - hosts: localhost
   tasks:
     - name: "Upload all the log files to storage"

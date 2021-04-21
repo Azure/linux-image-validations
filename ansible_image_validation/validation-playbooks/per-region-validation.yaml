@@ -1,3 +1,13 @@
+###
+# This Playbook contains validations which run for every region. 
+# Input: {{ item }} - is the combination of region name and ip in the format
+#                     <region_name>:<region_ip>
+#                     Example: westus:10.0.0.2
+# The region gets configured at the start of the playbook and rest of the
+# playbook runs all the validations which are dependent on the region.
+# For example - yum calls
+###
+
 ---
 - name: Set image properties
   set_fact:

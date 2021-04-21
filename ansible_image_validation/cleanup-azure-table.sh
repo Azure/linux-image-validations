@@ -1,4 +1,5 @@
-#az vm image list --all --publisher redhat | grep urn | cut -d'"' -f4 | grep ':rhel' | grep -v ":6" >> allimages.tmp
+## Executes the Azure Table Storage CleanUp script
+## with correct parameters and configurations
 
 . ./configurations/set-env-configs.sh
 python cleanup-azure-table.py \

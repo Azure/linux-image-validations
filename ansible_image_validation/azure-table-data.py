@@ -8,11 +8,18 @@ from azure.cosmosdb.table.tableservice import TableService
 from azure.cosmosdb.table.models import Entity
 
 class AzureTableData:
+    """
+    This class handles the functionality of getting data from
+    Azure Table Storage and generating the HTML report
+    """
     def __init__(self, args):
         connect_str = args.connection_str
         self.table_service = TableService(connection_string=connect_str)
 
     def get_report_line(self, index, image, context):
+        """
+        This function generates a single row of resultant validation report
+        """
         result_line = "\t<tr class='" + context + "'>\n"
 
         if hasattr(image, 'ErrorMessages'):
@@ -29,6 +36,9 @@ class AzureTableData:
         return result_line
         
     def generate_validation_report(self, args):
+        """
+        This functions generates the HTML report of validations
+        """
         imagequeryresult = self.table_service.query_entities(args.table_name,
             filter="IsDeleted eq '0'",
             accept='application/json;odata=minimalmetadata')
@@ -78,7 +88,12 @@ class AzureTableData:
             
 
     def select_images_to_validate(self, args):
-        max_vms_to_validate_at_a_time = int(args.max_vm_to_validate ) #os.environ['MAX_VM_TO_VALIDATE'])
+        """
+        This function iterates over all the entries in the Azure Table Storage
+        and selects at max 'args.max_vm_to_validate' images which should get validated 
+        during this run.
+        """
+        max_vms_to_validate_at_a_time = int(args.max_vm_to_validate )
         validation_period = int(args.validation_period)
 
         allimages = open(args.all_image_list, 'r')
@@ -130,6 +145,9 @@ class AzureTableData:
                 i += 1
 
     def insert_data(self, args):
+        """
+        Inserts/updates the records in the Azure Table Storage
+        """
         table_name = args.table_name
         image_name = args.image_name
         validation_time = args.validation_time

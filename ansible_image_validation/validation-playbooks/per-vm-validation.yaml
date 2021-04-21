@@ -1,3 +1,8 @@
+###
+# This Playbook runs validations which are specific to a VM and 
+# doesn't depend on which region the VM is deployed in.
+###
+
 ---
 - name: Set image properties
   set_fact:

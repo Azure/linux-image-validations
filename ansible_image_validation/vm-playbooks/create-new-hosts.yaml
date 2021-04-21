@@ -1,3 +1,7 @@
+###
+# This Playbook creates VM from a given Azure image URN 
+###
+
 ---
 - name: Debug input parameter
   debug:

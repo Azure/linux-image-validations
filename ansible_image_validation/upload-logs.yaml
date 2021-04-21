@@ -1,3 +1,10 @@
+###
+# This Playbook uploads the logs generate from validations to a configured storage 
+# account.
+# Input: {{ item }} - name of the host machine. 
+# Assumption: All the related logs of a machine are present inside the folder
+#             ./validation_results/<hostname>
+###
 ---
 - set_fact:
     hostname: "{{ item }}"
