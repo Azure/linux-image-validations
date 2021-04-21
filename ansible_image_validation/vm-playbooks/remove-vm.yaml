@@ -1,0 +1,28 @@
+###
+# This Playbook removes a VM and it's related resources
+# Input: {{ item }} - is the Azure image URN
+# Assumption: that the VM was created using the create-ne-hosts.yaml playbook
+###
+
+---
+- name: Set image properties
+  set_fact:
+    publisher: "{{ item.split(':')[0] }}"
+    offer: "{{ item.split(':')[1] }}"
+    sku: "{{ item.split(':')[2] }}"
+    version: "{{ item.split(':')[3] }}"
+    ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    resource_group: "{{ lookup('env', 'RESOURCE_GROUP') }}"
+
+- name: Set VM name variable
+  set_fact:
+    vmname: "{{ offer | replace('_','-') }}-{{ sku | replace('_','-') }}-{{ version }}"
+- debug:    
+    msg: "Deleting - {{vmname}}"
+    
+- name: Remove a VM and all resources that were autocreated
+  azure_rm_virtualmachine:
+    resource_group: "{{ resource_group }}"
+    name: "{{ vmname }}"
+    remove_on_absent: all
+    state: absent
