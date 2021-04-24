@@ -7,7 +7,7 @@ CURR_DIR=$(pwd)
 BASEDIR=$(dirname "$0")
 cd $BASEDIR
 
-echo "" > /var/log/validation.log 
+# echo "" > /var/log/validation.log 
 
 . ./configurations/set-env-configs.sh
 
@@ -27,7 +27,7 @@ python azure-table-data.py \
 ## This playbook will run validations
 ## Copy logs to blob
 ## Update table storage entries
-/home/pbasnal/.local/bin/ansible-playbook validate-vm-images.yaml
+ansible-playbook validate-vm-images.yaml -vvv
 
 cd $CURR_DIR
 
