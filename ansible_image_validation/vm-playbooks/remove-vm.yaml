@@ -1,3 +1,9 @@
+###
+# This Playbook removes a VM and it's related resources
+# Input: {{ item }} - is the Azure image URN
+# Assumption: that the VM was created using the create-ne-hosts.yaml playbook
+###
+
 ---
 - name: Set image properties
   set_fact:

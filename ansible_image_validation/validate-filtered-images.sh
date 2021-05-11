@@ -1,3 +1,7 @@
+## This script start the validation process.
+## It generates a list of images which should get validated
+## and then runs the playbook which validates all the images.
+
 ## Set configurations
 CURR_DIR=$(pwd)
 BASEDIR=$(dirname "$0")

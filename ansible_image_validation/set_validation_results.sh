@@ -1,3 +1,8 @@
+## This script reads all the validation logs and marks every image 
+## as success or failure.
+## It also executes the python script which updates the validation 
+## result in the Storage Account
+
 IMAGE_NAME=$1
 CURRENT_EPOCH=$2
 VALIDATION_TIME=$3
