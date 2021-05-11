@@ -1,3 +1,13 @@
+###
+# This Playbook contains validations which run for every region. 
+# Input: {{ item }} - is the combination of region name and ip in the format
+#                     <region_name>:<region_ip>
+#                     Example: westus:10.0.0.2
+# The region gets configured at the start of the playbook and rest of the
+# playbook runs all the validations which are dependent on the region.
+# For example - yum calls
+###
+
 ---
 - name: Set image properties
   set_fact:
@@ -31,12 +41,19 @@
     path: "{{ err_folder }}/{{ region_name}}"
     state: directory
 
+- name: Create err and out files
+  file:
+    path: "{{ file_name }}"
+    state: touch
+  with_items: 
+    - "{{err_folder}}/{{region_name}}/{{ yum_err_file }}"
+    - "{{out_folder}}/{{region_name}}/{{ yum_out_file }}"
+  loop_control:
+    loop_var: file_name
+
 - name: Run Yum Repolist
   shell: |
-    touch {{err_folder}}/{{region_name}}/{{ yum_err_file }}
-    touch {{out_folder}}/{{region_name}}/{{ yum_out_file }}
-    
-    yum update -q -y --disablerepo='*' --enablerepo='rhui-microsoft-azure*'
+    yum update -q -y --disablerepo='*' --enablerepo='*microsoft-azure*'
 
     yum clean all
     yum repolist -v

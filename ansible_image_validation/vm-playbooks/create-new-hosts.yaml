@@ -1,3 +1,7 @@
+###
+# This Playbook creates VM from a given Azure image URN 
+###
+
 ---
 - name: Debug input parameter
   debug:
@@ -24,6 +28,7 @@
     msg: "Creating VM - {{ vmname }}"
 
 - name: Create VM
+  no_log: true
   azure_rm_virtualmachine:
     resource_group: "{{ resource_group }}"
     name: "{{ vmname }}"
@@ -43,8 +48,12 @@
   register: azurevm
   ignore_errors: yes
 
+- name: Debug IP
+  debug:
+    msg: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
+
 - set_fact:
-    azurevm_privateip: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+    azurevm_privateip: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
   when: azurevm.failed == false
   ignore_errors: yes
 
