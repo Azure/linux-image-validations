@@ -48,12 +48,8 @@
   register: azurevm
   ignore_errors: yes
 
-- name: Debug IP
-  debug:
-    msg: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-
 - set_fact:
-    azurevm_privateip: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
+    azurevm_privateip: "{{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
   when: azurevm.failed == false
   ignore_errors: yes
 
