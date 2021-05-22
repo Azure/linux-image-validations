@@ -46,7 +46,7 @@
     touch {{err_folder}}/{{region_name}}/{{ yum_err_file }}
     touch {{out_folder}}/{{region_name}}/{{ yum_out_file }}
     
-    yum update -q -y --disablerepo='*' --enablerepo='rhui-microsoft-azure*'
+    yum update -q -y --disablerepo='*' --enablerepo='*microsoft-azure*'
 
     yum clean all
     yum repolist -v

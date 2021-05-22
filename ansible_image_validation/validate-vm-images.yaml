@@ -28,29 +28,21 @@
   gather_facts: False
   remote_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
   become: true
-
   vars:
     ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
-
   tasks:
     - set_fact:
         rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
         out_folder: /tmp/out
         err_folder: /tmp/err
+        offer_type: "{{ 'byos' if 'byos' in inventory_hostname else 'payg' }}"
 
     - name: Delete validation data from previous run
-      shell: rm -rf /tmp/out && rm -rf /tmp/err
+      shell: |
+        rm -rf /tmp/out && rm -rf /tmp/err
+        mkdir -p {{ out_folder }}
+        mkdir -p {{ err_folder }}
       ignore_errors: yes
-
-    - name: Create yum err directory
-      file:
-        path: "{{ out_folder }}"
-        state: directory
-
-    - name: Create yum err directory
-      file:
-        path: "{{ err_folder }}"
-        state: directory
 
     - name: Run per VM validations
       include_tasks: validation-playbooks/per-vm-validation.yaml
@@ -59,7 +51,7 @@
     - name: Run per region validations
       include_tasks: validation-playbooks/per-region-validation.yaml
       loop: "{{ rhui_regions }}"
-      when: item != ""
+      when: item != "" and offer_type == 'payg'
       ignore_errors: yes
 
     ## ########################################################################## 
