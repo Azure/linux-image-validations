@@ -25,10 +25,6 @@
   package_facts:
     manager: "auto"
 
-- debug: Cloud-init not found
-    msg: "Cloud-init not found"
-  when: "'cloud-init' not in ansible_facts.packages"
-
 - name: Write to error msg if repolist failed
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
