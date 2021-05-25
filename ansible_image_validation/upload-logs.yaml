@@ -26,13 +26,15 @@
     resource_group: "{{ sa_resource_group }}"
     storage_account_name: "{{ storage_account_name }}"
     container: "{{ container_name }}"
-    blob: "{{ hostname }}{{ item.path.split('tmp')[1] }}"
-    src: "{{ item.path }}"
+    blob: "{{ hostname }}{{ file_name.path.split('tmp')[1] }}"
+    src: "{{ file_name.path }}"
     public_access: container
     tags:
       validation_time: "{{ current_time }}"
     force: yes 
   loop: "{{ logfiles.files }}"
+  loop_control:
+    loop_var: file_name
 
 - name: Create table entry
   shell: |
