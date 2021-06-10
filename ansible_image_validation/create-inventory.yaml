@@ -1,0 +1,19 @@
+## This section creates the VMs which should get validated
+## And then adds them to an ansible host group 'just_created'
+---
+- hosts: localhost
+  gather_facts: False
+  collections:
+    - azure.azcollection
+  
+  tasks:
+    - set_fact:
+        marketplace_images: "{{ lookup('file', 'files/filteredimages').split() }}"
+    
+    - name: Clean logs from pevious run
+      shell: rm -rf ./validation_results
+
+    - name: "Create VMs of the URNs from imagelist"
+      include_tasks: vm-playbooks/create-new-hosts.yaml
+      loop: "{{ marketplace_images }}"
+      when: item != ""

@@ -54,6 +54,7 @@
 - name: Run Yum Repolist
   shell: |
     yum update -q -y --disablerepo='*' --enablerepo='*microsoft-azure*'
+
     yum clean all
     yum repolist -v
   register: yum_output

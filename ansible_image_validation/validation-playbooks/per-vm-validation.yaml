@@ -20,7 +20,19 @@
   shell: getent passwd {1000..60000} | grep -v {{ admin_user }} | wc -l
   register: users_on_machine
   ignore_errors: yes
-    
+
+- name: Collect list of all installed packages
+  package_facts:
+    manager: "auto"
+
+- name: Check if cloud-init is installed
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "'cloud-init' not found"
+    create: yes
+    state: present
+  when: "'cloud-init' not in ansible_facts.packages"
+
 - name: Write to error msg if repolist failed
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"

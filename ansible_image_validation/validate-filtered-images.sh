@@ -27,7 +27,9 @@ python azure-table-data.py \
 ## This playbook will run validations
 ## Copy logs to blob
 ## Update table storage entries
-ansible-playbook validate-vm-images.yaml -vvv
+ansible-playbook create-inventory.yaml -vvv
+ansible-playbook validate-vm-images.yaml -i inventory.ini -vvv
+ansible-playbook upload-and-clean-up.yaml -i inventory.ini -vvv
 
 cd $CURR_DIR
 

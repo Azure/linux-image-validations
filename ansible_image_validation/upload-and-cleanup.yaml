@@ -1,0 +1,13 @@
+## This section uploads all the validation logs generated for all
+## the VMs to a configured storage account
+---
+- hosts: localhost
+  tasks:
+    - name: "Upload all the log files to storage"
+      include_tasks: upload-logs.yaml
+      loop: "{{ groups['just_created'] }}"
+    
+    - name: Remove VMs created for validation
+      include_tasks: vm-playbooks/remove-vm.yaml
+      loop: "{{ marketplace_images }}"
+      when: item != ""

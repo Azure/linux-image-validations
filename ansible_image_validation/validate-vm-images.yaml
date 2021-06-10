@@ -2,57 +2,28 @@
 # This Playbook orchestrate creation, validation, report generation
 # and upload of validation logs.
 ###
----
-## This section creates the VMs which should get validated
-## And then adds them to an ansible host group 'just_created'
-- hosts: localhost
-  gather_facts: False
-  collections:
-    - azure.azcollection
-  
-  tasks:
-    - set_fact:
-        marketplace_images: "{{ lookup('file', 'files/filteredimages').split() }}"
-    
-    - name: Clean logs from pevious run
-      file:
-        path: ./validation_results
-        state: absent
-
-    - name: "Create VMs of the URNs from imagelist"
-      include_tasks: vm-playbooks/create-new-hosts.yaml
-      loop: "{{ marketplace_images }}"
-      when: item != ""
-
 ## This section takes the ansible host group 'just_created'
 ## and runs validations against them
-- hosts: just_created
+---
+- hosts: all
   gather_facts: False
   remote_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
   become: true
-
   vars:
     ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
-
   tasks:
     - set_fact:
         rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
         out_folder: /tmp/out
         err_folder: /tmp/err
+        offer_type: "{{ 'byos' if 'byos' in inventory_hostname else 'payg' }}"
 
     - name: Delete validation data from previous run
-      shell: rm -rf /tmp/out && rm -rf /tmp/err
+      shell: |
+        rm -rf /tmp/out && rm -rf /tmp/err
+        mkdir -p {{ out_folder }}
+        mkdir -p {{ err_folder }}
       ignore_errors: yes
-
-    - name: Create yum err directory
-      file:
-        path: "{{ out_folder }}"
-        state: directory
-
-    - name: Create yum err directory
-      file:
-        path: "{{ err_folder }}"
-        state: directory
 
     - name: Run per VM validations
       include_tasks: validation-playbooks/per-vm-validation.yaml
@@ -61,7 +32,7 @@
     - name: Run per region validations
       include_tasks: validation-playbooks/per-region-validation.yaml
       loop: "{{ rhui_regions }}"
-      when: item != ""
+      when: item != "" and offer_type == 'payg'
       ignore_errors: yes
 
     ## ########################################################################## 
@@ -99,16 +70,3 @@
         src: "{{ item.path }}"
         dest: ./validation_results
       loop: "{{ files_list }}"
-
-## This section uploads all the validation logs generated for all
-## the VMs to a configured storage account
-- hosts: localhost
-  tasks:
-    - name: "Upload all the log files to storage"
-      include_tasks: upload-logs.yaml
-      loop: "{{ groups['just_created'] }}"
-    
-    - name: Remove VMs created for validation
-      include_tasks: vm-playbooks/remove-vm.yaml
-      loop: "{{ marketplace_images }}"
-      when: item != ""
