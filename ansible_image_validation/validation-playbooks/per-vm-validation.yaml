@@ -25,7 +25,7 @@
   package_facts:
     manager: "auto"
 
-- name: Write to error msg if repolist failed
+- name: Check if cloud-init is installed
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
     line: "'cloud-init' not found"
