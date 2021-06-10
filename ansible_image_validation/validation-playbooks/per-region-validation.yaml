@@ -41,11 +41,18 @@
     path: "{{ err_folder }}/{{ region_name}}"
     state: directory
 
+- name: Create err and out files
+  file:
+    path: "{{ file_name }}"
+    state: touch
+  with_items: 
+    - "{{err_folder}}/{{region_name}}/{{ yum_err_file }}"
+    - "{{out_folder}}/{{region_name}}/{{ yum_out_file }}"
+  loop_control:
+    loop_var: file_name
+
 - name: Run Yum Repolist
   shell: |
-    touch {{err_folder}}/{{region_name}}/{{ yum_err_file }}
-    touch {{out_folder}}/{{region_name}}/{{ yum_out_file }}
-    
     yum update -q -y --disablerepo='*' --enablerepo='*microsoft-azure*'
 
     yum clean all

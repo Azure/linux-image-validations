@@ -28,6 +28,7 @@
     msg: "Creating VM - {{ vmname }}"
 
 - name: Create VM
+  no_log: true
   azure_rm_virtualmachine:
     resource_group: "{{ resource_group }}"
     name: "{{ vmname }}"
