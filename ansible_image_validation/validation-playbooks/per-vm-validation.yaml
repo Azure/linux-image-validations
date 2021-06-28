@@ -10,7 +10,7 @@
     admin_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
 
 #TODO : commenting for now, as this check if failing for rhel7
-# - name: Check number of users on the machine
+# - name: Check if Grubenv file is symlink
 #   shell: |
 #     if [[ -L "/boot/grub2/grubenv" ]]; then   
 #       echo "Grubenv file is symlink" >> {{err_folder}}/err_msgs.log
