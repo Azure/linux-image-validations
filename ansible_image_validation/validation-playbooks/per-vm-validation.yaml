@@ -42,17 +42,7 @@
     state: present
   when: users_on_machine.stdout_lines[0] != '0'
 
-- name: Check if the packages required by Azure Disk Encryption is installed
-  command: rpm -q "{{ item }}"
-  loop: "{{ packages_req_by_ADE }}"
-  register: package_check
-  when: ansible_os_family == "RedHat" and (ansible_distribution_major_version == "8" or ansible_distribution_major_version == "7")
+- name: check if ADE validation is valid for this vm
+  include_tasks: validation-playbooks/ade_packages_validation.yaml
   ignore_errors: yes
-
-- name: "Print execution results"
-  lineinfile:
-    path: "{{err_folder}}/err_msgs.log"
-    line: "packages required for ADE are not present"
-    create: yes
-    state: present
-  when: package_check is not succeeded
+  when: ansible_os_family == "RedHat" and (ansible_distribution_major_version == "8" or ansible_distribution_major_version == "7")

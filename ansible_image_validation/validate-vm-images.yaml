@@ -11,17 +11,7 @@
   become: true
   vars:
     ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
-    packages_req_by_ADE:
-      - lsscsi
-      - psmisc
-      - lvm2
-      - uuid
-      - at
-      - patch
-      - cryptsetup
-      - cryptsetup-reencrypt
-      - procps-ng
-      - util-linux
+  
   tasks:
     - set_fact:
         rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
