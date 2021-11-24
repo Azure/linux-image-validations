@@ -13,11 +13,16 @@
     ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
   
   tasks:
+    - assert:
+        that:
+          - "offer_type is defined"
+
     - set_fact:
         rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
         out_folder: /tmp/out
         err_folder: /tmp/err
-        offer_type: "{{ 'byos' if 'byos' in inventory_hostname else 'payg' }}"
+        license_type: "{{ 'byos' if 'byos' in inventory_hostname else 'payg' }}"
+        repo_type: "{{'base' if 'base' in offer_type else ('byol' if 'byol' in offer_type else 'eus')}}"
 
     - name: Delete validation data from previous run
       shell: |
@@ -33,7 +38,7 @@
     - name: Run per region validations
       include_tasks: validation-playbooks/per-region-validation.yaml
       loop: "{{ rhui_regions }}"
-      when: item != "" and offer_type == 'payg'
+      when: item != "" and license_type == 'payg'
       ignore_errors: yes
 
     ## ########################################################################## 
