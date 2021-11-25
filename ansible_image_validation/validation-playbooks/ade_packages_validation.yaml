@@ -1,0 +1,45 @@
+###
+# This Playbook checks if the packages required by Azure Disk Encryption is installed 
+###
+
+---
+
+- name: Check if the packages required by Azure Disk Encryption is installed
+  command: rpm -q "{{ item }}"
+  loop:
+    - lsscsi
+    - psmisc
+    - lvm2
+    - uuid
+    - at
+    - patch
+    - cryptsetup
+    - cryptsetup-reencrypt
+    - procps-ng
+    - util-linux
+  register: package_check
+  ignore_errors: yes
+
+- name: "Write to error msg if ADE packages are not present"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "packages required for ADE are not present"
+    create: yes
+    state: present
+  when: package_check is not succeeded
+
+- name: "Get list of missing packages required for ADE"
+  set_fact: missing_packages="{{ package_check.results | json_query(jmesquery)}}"
+  vars:
+    jmesquery: '[?rc==`1`].stdout'
+  when: package_check is not succeeded
+
+- name: "Write missing ADE packages to the error msg"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "{{item}}"
+    create: yes
+    state: present
+  with_items: "{{missing_packages}}"
+  when: package_check is not succeeded
+  
