@@ -45,4 +45,4 @@
 - name: check if ADE validation is valid for this vm
   include_tasks: validation-playbooks/ade_packages_validation.yaml
   ignore_errors: yes
-  when: ansible_os_family == "RedHat" and (ansible_distribution_major_version == "8" or ansible_distribution_major_version == "7") and repo_type != 'eus'
+  when: ansible_os_family == "RedHat" and (ansible_distribution_major_version == "8" or ansible_distribution_major_version == "7") and repo_type == 'base'
