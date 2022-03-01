@@ -11,6 +11,7 @@
   become: true
   vars:
     ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
+
   
   tasks:
     - assert:
@@ -23,7 +24,7 @@
         err_folder: /tmp/err
         license_type: "{{ 'byos' if 'byos' in inventory_hostname else 'payg' }}"
         repo_type: "{{'base' if 'base' in offer_type else ('byol' if 'byol' in offer_type else 'eus')}}"
-
+  
     - name: Delete validation data from previous run
       shell: |
         rm -rf /tmp/out && rm -rf /tmp/err
