@@ -37,10 +37,19 @@
   debug:
     var: blacklisted_drivers_allimages
 
+
 # remove after testing
-- name: print blacklisted_drivers_specific_rhelversion
+- name: print blacklisted_drivers_specific_rhelversion for all images
   debug:
     var: blacklisted_drivers_specific_rhelversion
+
+- name: Initialize an empty list for storing blacklisted drivers
+  set_fact:
+    missing_drivers_allimages: []
+
+- name: Initialize an empty list for storing blacklisted drivers for specific images
+  set_fact:
+    missing_drivers_specific_rhelversion: []
 
 - name: "Get list of missing drivers to be blacklisted in RHEL 7.9 and 8.3 images"
   set_fact: missing_drivers_allimages="{{ blacklisted_drivers_allimages.results | json_query(jmesquery)}}"
@@ -58,7 +67,7 @@
 - name: "Write to error msg if some drivers are not blacklisted"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "failed to blacklist the following drivers"
+    line: "\nFailed to blacklist the following drivers"
     create: yes
     state: present
   when: (blacklisted_drivers_allimages is not succeeded) or (blacklisted_drivers_specific_rhelversion is not succeeded)
