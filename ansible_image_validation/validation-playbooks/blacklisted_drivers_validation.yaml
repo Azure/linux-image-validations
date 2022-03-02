@@ -61,7 +61,7 @@
     line: "failed to blacklist the following drivers"
     create: yes
     state: present
-  when: (blacklisted_drivers_allimages is not succeeded) and (blacklisted_drivers_specific_rhelversion is not succeeded)
+  when: (blacklisted_drivers_allimages is not succeeded) or (blacklisted_drivers_specific_rhelversion is not succeeded)
 
 - name: "Add missing drivers from the blacklist configuration"
   lineinfile:
@@ -70,4 +70,4 @@
     create: yes
     state: present
   with_items: "{{missing_drivers_allimages + missing_drivers_specific_rhelversion}}"
-  when: (blacklisted_drivers_allimages is not succeeded) and (blacklisted_drivers_specific_rhelversion is not succeeded)
+  when: (blacklisted_drivers_allimages is not succeeded) or (blacklisted_drivers_specific_rhelversion is not succeeded)
