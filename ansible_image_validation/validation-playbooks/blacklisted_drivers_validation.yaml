@@ -13,7 +13,7 @@
   debug:
     var: blacklisted_drivers
 
-- name: Check the drivers are blacklisted using modprobed in all images
+- name: Check if the drivers are blacklisted using modprobed in all images
   shell: modprobe --showconfig | grep blacklist | grep "blacklist {{item}}"
   register: blacklisted_drivers_allimages
   with_items:
@@ -24,7 +24,7 @@
     - intel_cstate
   ignore_errors: yes
 
-- name: Check the amdgpu driver is blacklisted in RHEL 7.9 and 8.3 images
+- name: Check if the drivers are  blacklisted in RHEL 7.9 and 8.3 images
   shell: modprobe --showconfig | grep blacklist | grep "blacklist {{item}}"
   register: blacklisted_drivers_specific_rhelversion
   with_items:
