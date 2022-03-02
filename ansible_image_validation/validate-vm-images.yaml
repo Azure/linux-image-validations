@@ -12,7 +12,6 @@
   vars:
     ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
 
-  
   tasks:
     - assert:
         that:

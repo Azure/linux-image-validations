@@ -2,14 +2,13 @@
 # This Playbook checks if the some specific drivers are blacklisted in the given image
 # Author: Anuj Maurya  
 ###
-
 ---
-
+# remove after testing
 - name: Check the drivers are blacklisted using modprobed in all images
   shell: modprobe --showconfig | grep blacklist
   register: blacklisted_drivers
   ignore_errors: yes
-
+# remove after testing
 - name: print blacklisted_drivers
   debug:
     var: blacklisted_drivers
@@ -72,5 +71,3 @@
     state: present
   with_items: "{{missing_drivers_allimages + missing_drivers_specific_rhelversion}}"
   when: (blacklisted_drivers_allimages is not succeeded) and (blacklisted_drivers_specific_rhelversion is not succeeded)
-
-  
