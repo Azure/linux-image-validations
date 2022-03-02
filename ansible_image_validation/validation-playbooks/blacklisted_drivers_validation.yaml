@@ -18,7 +18,7 @@
   register: blacklisted_drivers_allimages
   with_items:
     - nouveau
-    - lbm-nouveau
+    - lbm_nouveau
     - floppy
     - skx_edac
     - intel_cstate
