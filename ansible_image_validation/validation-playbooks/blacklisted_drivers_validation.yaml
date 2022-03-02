@@ -3,15 +3,6 @@
 # Author: Anuj Maurya  
 ###
 ---
-# remove after testing
-- name: Check the drivers are blacklisted using modprobed in all images
-  shell: modprobe --showconfig | grep blacklist
-  register: blacklisted_drivers
-  ignore_errors: yes
-# remove after testing
-- name: print blacklisted_drivers
-  debug:
-    var: blacklisted_drivers
 
 - name: Check if the drivers are blacklisted using modprobed in all images
   shell: modprobe --showconfig | grep blacklist | grep "blacklist {{item}}"
@@ -31,17 +22,6 @@
     - amdgpu
   ignore_errors: yes
   when: ansible_distribution_version == "8.3" or ansible_distribution_version == "7.9"
-
-# remove after testing
-- name: print blacklisted_drivers_allimages
-  debug:
-    var: blacklisted_drivers_allimages
-
-
-# remove after testing
-- name: print blacklisted_drivers_specific_rhelversion for all images
-  debug:
-    var: blacklisted_drivers_specific_rhelversion
 
 - name: Initialize an empty list for storing blacklisted drivers
   set_fact:
