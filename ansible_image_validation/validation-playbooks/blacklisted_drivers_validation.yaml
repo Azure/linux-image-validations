@@ -4,6 +4,10 @@
 ###
 ---
 
+- name: Print RHEL minor version
+  debug:
+    msg: "ansible_distribution_version: {{ ansible_distribution_version }}"
+
 - name: Check if the drivers are blacklisted using modprobed in all images
   shell: modprobe --showconfig | grep blacklist | grep "blacklist {{item}}"
   register: blacklisted_drivers_allimages
