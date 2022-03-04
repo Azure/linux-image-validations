@@ -17,6 +17,14 @@
 #     fi
 #   ignore_errors: yes
 
+- name: Compare RHEL version with the expected RHEL version in the pipeline
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "RHEL version mismatch: Expected RHEL version: {{rhel_version}}, current RHEL version: {{ansible_distribution_version}} "
+    create: yes
+    state: present
+  when: "ansible_distribution_version != rhel_version"
+
 - name: Check number of users on the machine
   shell: getent passwd {1000..60000} | grep -v {{ admin_user }} | wc -l
   register: users_on_machine
