@@ -16,6 +16,7 @@
     - assert:
         that:
           - "offer_type is defined"
+          - "rhel_version is defined"
 
     - set_fact:
         rhui_regions: "{{ lookup('file', 'files/rhui-regions').split() }}"
