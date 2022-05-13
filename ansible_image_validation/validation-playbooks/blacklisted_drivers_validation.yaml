@@ -17,23 +17,12 @@
     - floppy
     - skx_edac
     - intel_cstate
-  ignore_errors: yes
-
-- name: Check if the drivers are  blacklisted in RHEL 7.9 and 8.3 images
-  shell: modprobe --showconfig | grep blacklist | grep "blacklist {{item}}"
-  register: blacklisted_drivers_specific_rhelversion
-  with_items:
     - amdgpu
   ignore_errors: yes
-  when: ansible_distribution_version == "8.3" or ansible_distribution_version == "7.9"
 
 - name: Initialize an empty list for storing blacklisted drivers
   set_fact:
     missing_drivers_allimages: []
-
-- name: Initialize an empty list for storing blacklisted drivers for specific images
-  set_fact:
-    missing_drivers_specific_rhelversion: []
 
 - name: "Get list of missing drivers to be blacklisted in RHEL 7.9 and 8.3 images"
   set_fact: missing_drivers_allimages="{{ blacklisted_drivers_allimages.results | json_query(jmesquery)}}"
@@ -41,20 +30,13 @@
     jmesquery: '[?rc==`1`].item'
   when: blacklisted_drivers_allimages is not succeeded
 
-- name: "Get list of missing drivers to be blacklisted in all images"
-  set_fact: missing_drivers_specific_rhelversion="{{ blacklisted_drivers_specific_rhelversion.results | json_query(jmesquery)}}"
-  vars:
-    jmesquery: '[?rc==`1`].item'
-  when: blacklisted_drivers_specific_rhelversion is not succeeded
-
-
 - name: "Write to error msg if some drivers are not blacklisted"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
     line: "\nFailed to blacklist the following drivers"
     create: yes
     state: present
-  when: (blacklisted_drivers_allimages is not succeeded) or (blacklisted_drivers_specific_rhelversion is not succeeded)
+  when: blacklisted_drivers_allimages is not succeeded
 
 - name: "Add missing drivers from the blacklist configuration"
   lineinfile:
@@ -62,5 +44,5 @@
     line: "{{item}} is not blacklisted"
     create: yes
     state: present
-  with_items: "{{missing_drivers_allimages + missing_drivers_specific_rhelversion}}"
-  when: (blacklisted_drivers_allimages is not succeeded) or (blacklisted_drivers_specific_rhelversion is not succeeded)
+  with_items: "{{missing_drivers_allimages}}"
+  when: blacklisted_drivers_allimages is not succeeded
