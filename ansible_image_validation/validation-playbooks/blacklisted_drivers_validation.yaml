@@ -24,7 +24,7 @@
   set_fact:
     missing_drivers_allimages: []
 
-- name: "Get list of missing drivers to be blacklisted in RHEL 7.9 and 8.3 images"
+- name: "Get list of missing drivers to be blacklisted in RHEL images"
   set_fact: missing_drivers_allimages="{{ blacklisted_drivers_allimages.results | json_query(jmesquery)}}"
   vars:
     jmesquery: '[?rc==`1`].item'
