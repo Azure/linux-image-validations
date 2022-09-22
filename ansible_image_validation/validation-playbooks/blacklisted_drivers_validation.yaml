@@ -17,15 +17,18 @@
     - floppy
     - skx_edac
     - intel_cstate
+    - amdgpu
   ignore_errors: yes
 
-- name: Check if the drivers are  blacklisted in RHEL 7.9 and 8.3 images
+- name: Check if the drivers are  blacklisted in RHEL 8.1 images
   shell: modprobe --showconfig | grep blacklist | grep "blacklist {{item}}"
   register: blacklisted_drivers_specific_rhelversion
   with_items:
-    - amdgpu
+    - blacklist intel_uncore
+    - blacklist intel_rapl
+    - blacklist acpi_cpufreq
   ignore_errors: yes
-  when: ansible_distribution_version == "8.3" or ansible_distribution_version == "7.9"
+  when: ansible_distribution_version == "8.1"
 
 - name: Initialize an empty list for storing blacklisted drivers
   set_fact:
@@ -35,7 +38,7 @@
   set_fact:
     missing_drivers_specific_rhelversion: []
 
-- name: "Get list of missing drivers to be blacklisted in RHEL 7.9 and 8.3 images"
+- name: "Get list of missing drivers to be blacklisted in RHEL 8.1 images"
   set_fact: missing_drivers_allimages="{{ blacklisted_drivers_allimages.results | json_query(jmesquery)}}"
   vars:
     jmesquery: '[?rc==`1`].item'
