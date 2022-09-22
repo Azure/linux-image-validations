@@ -18,15 +18,15 @@
     - skx_edac
     - intel_cstate
     - amdgpu
+    - intel_uncore
+    - acpi_cpufreq
   ignore_errors: yes
 
 - name: Check if the drivers are  blacklisted in RHEL 8.1 and 7.9 images
   shell: modprobe --showconfig | grep blacklist | grep "blacklist {{item}}"
   register: blacklisted_drivers_specific_rhelversion
   with_items:
-    - blacklist intel_uncore
-    - blacklist intel_rapl
-    - blacklist acpi_cpufreq
+    - intel_rapl
   ignore_errors: yes
   when: ansible_distribution_version == "8.1"  or ansible_distribution_version == "7.9"
 
