@@ -17,7 +17,7 @@
         that:
           - "offer_type is defined"
           - "rhel_version is defined"
-          - "buildOnRhui4 is defined"
+          - "build_on_rhui4 is defined"
 
     - set_fact:
         rhui3_regions: "{{ lookup('file', 'files/rhui3-regions').split() }}"
@@ -41,13 +41,13 @@
     - name: Run per region validations for RHUI3
       include_tasks: validation-playbooks/per-region-validation.yaml
       loop: "{{ rhui3_regions }}"
-      when: item != "" and license_type == 'payg' and buildOnRhui4 == 'false'
+      when: item != "" and license_type == 'payg' and build_on_rhui4 == 'false'
       ignore_errors: yes
 
     - name: Run per region validations fpr RHUI4
       include_tasks: validation-playbooks/per-region-validation.yaml
       loop: "{{ rhui4_regions }}"
-      when: item != "" and license_type == 'payg' and buildOnRhui4 == 'true'
+      when: item != "" and license_type == 'payg' and build_on_rhui4 == 'true'
       ignore_errors: yes
 
     ## ########################################################################## 
