@@ -24,7 +24,7 @@
     content: |
       127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
       ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-      {{ region_ip }}   rhui-1.microsoft.com rhui-2.microsoft.com rhui-3.microsoft.com
+      {{ region_ip }}   rhui-1.microsoft.com rhui-2.microsoft.com rhui-3.microsoft.com rhui4-1.microsoft.com
 
 - name: Clean logs from pevious run
   shell: |
