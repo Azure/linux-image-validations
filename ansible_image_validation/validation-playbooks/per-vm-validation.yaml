@@ -26,9 +26,12 @@
   when: "ansible_distribution_version != rhel_version"
 
 - name: Check number of users on the machine
-  shell: getent passwd {1000..60000} | grep -v {{ admin_user }} | wc -l
+  shell: getent passwd {1000..60000} | grep -v {{ admin_user }}
   register: users_on_machine
   ignore_errors: yes
+  
+- name: debug
+  debug: var=users_on_machine
 
 - name: Collect list of all installed packages
   package_facts:
