@@ -3,7 +3,7 @@
 # Author: Navpreet Kaur
 ###
 ---
-- name: Check if the drivers are blacklisted all images
+- name: Check if the nvme and pci drivers are present i all images
   shell: lsinitrd /boot | grep "{{item}}"
   register: check_drivers_allimages
   with_items:
