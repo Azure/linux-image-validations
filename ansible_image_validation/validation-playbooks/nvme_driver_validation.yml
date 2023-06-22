@@ -1,0 +1,14 @@
+###
+# This Playbook checks if the nvme and pci drivers are present in the given image
+# Author: Navpreet Kaur
+###
+---
+- name: Check if the drivers are blacklisted all images
+  shell: lsinitrd /boot | grep "{{item}}"
+  register: check_drivers_allimages
+  with_items:
+    - nvme
+    - pci 
+
+- debug:
+    var: check_drivers_allimages    
