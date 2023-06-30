@@ -59,3 +59,25 @@
   include_tasks: validation-playbooks/blacklisted_drivers_validation.yaml
   ignore_errors: yes
   when: ansible_os_family == "RedHat"
+
+- name: Check the kernel version
+  shell: uname -r
+  register: output_kernel_version
+
+- debug:
+    var: output_kernel_version.stdout_lines 
+
+- name: Set the kernel version
+  set_fact: 
+    kernel_version: "{{ output_kernel_version.stdout_lines | join}}"
+
+- debug:
+    var: kernel_version
+
+- name: Check if the nvme and pci drivers are present i all images
+  shell: lsinitrd /boot/initramfs-{{ kernel_version }}.img | grep {{ item }}
+  register: check_drivers_allimages
+  with_items:
+    - nvme
+    - pci 
+  failed_when: '"does not exist" in check_drivers_allimages.stderr'  
