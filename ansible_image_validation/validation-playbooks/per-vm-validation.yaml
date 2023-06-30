@@ -74,10 +74,18 @@
 - debug:
     var: kernel_version
 
-- name: Check if the nvme and pci drivers are present i all images
-  shell: lsinitrd /boot/initramfs-{{ kernel_version }}.img | grep {{ item }}
-  register: check_drivers_allimages
-  with_items:
-    - nvme
-    - pci 
-  failed_when: '"does not exist" in check_drivers_allimages.stderr'  
+- name: Check if the nvme drivers are present i all images
+  shell: lsinitrd /boot/initramfs-{{ kernel_version }}.img | grep nvme
+  register: check_nvme_allimages
+  failed_when: '"nvme" not in check_nvme_allimages.stdout'
+      
+- debug:
+    var: check_nvme_allimages     
+
+- name: Check if the  pci drivers are present i all images
+  shell: lsinitrd /boot/initramfs-{{ kernel_version }}.img | grep pci
+  register: check_pci_allimages
+  failed_when: '"pci" not in check_pci_allimages.stdout'        
+
+- debug:
+    var: check_pci_allimages   
