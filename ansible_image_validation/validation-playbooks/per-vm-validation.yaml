@@ -60,19 +60,13 @@
   ignore_errors: yes
   when: ansible_os_family == "RedHat"
 
-- name: Check the kernel version
-  shell: uname -r
-  register: output_kernel_version
-
-- debug:
-    var: output_kernel_version.stdout_lines 
+- name: Print all available facts
+  ansible.builtin.debug:
+    var: ansible_facts["kernel"]
 
 - name: Set the kernel version
   set_fact: 
-    kernel_version: "{{ output_kernel_version.stdout_lines | join}}"
-
-- debug:
-    var: kernel_version
+    kernel_version: "{{ ansible_facts['kernel'] | join}}"
 
 - name: Check if the nvme drivers are present i all images
   shell: lsinitrd /boot/initramfs-{{ kernel_version }}.img | grep nvme
