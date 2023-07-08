@@ -60,24 +60,20 @@
   ignore_errors: yes
   when: ansible_os_family == "RedHat"
 
-- name: Check if the nvme drivers are present i all images
-  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep nvme
-  register: check_nvme_allimages
-      
-- debug:
-    var: check_nvme_allimages     
-
-- name: Check if the pci drivers are present i all images
-  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep pci
-  register: check_pci_allimages
+- name: Check if the nvme drivers are present in all images
+  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep {{ item }}
+  register: check_nvme_pci_allimages
+  with_items:
+    - nvme
+    - pci    
 
 - debug:
-    var: check_pci_allimages  
+    var: check_nvme_pci_allimages.results  
 
 - name: "Write to error msg if some drivers are not present"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\nFailed to find the nvme and pci drivers"
+    line: "\n Errors Detected as shown below: \n {{ check_nvme_pci_allimages.results }} "
     create: yes
     state: present
-  when: ("pci" not in check_pci_allimages.stdout) or ("nvme" not in check_pci_allimages.stdout)    
+  when: ("nvme" not in check_nvme_pci_allimages.results[0].stdout) or ("pci" not in check_nvme_pci_allimages.results[1].stdout) 
