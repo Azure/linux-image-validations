@@ -60,7 +60,7 @@
   ignore_errors: yes
   when: ansible_os_family == "RedHat"
 
-- name: Check if the nvme drivers are present in all images
+- name: Check if the nvme and pci drivers are present in all images
   shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep {{ item }}
   register: check_nvme_pci_allimages
   with_items:
