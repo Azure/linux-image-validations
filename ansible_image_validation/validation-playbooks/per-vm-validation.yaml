@@ -73,7 +73,13 @@
 - name: "Write to error msg if some drivers are not present"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n Errors Detected as shown below: \n {{ check_nvme_pci_allimages.results }} "
+    line: "\n NVME validation failed since driver is not present. "
     create: yes
-    state: present
+    state: present 
   when: ("nvme" not in check_nvme_pci_allimages.results[0].stdout) or ("pci" not in check_nvme_pci_allimages.results[1].stdout) 
+
+- name: "Get list of missing drivers required for nvme validation"
+  set_fact: missing_drivers="{{ check_nvme_pci_allimages.results | json_query(jmesquery)}}"
+  vars:
+    jmesquery: '[?rc==`1`].stdout'
+  when: check_nvme_pci_allimages is not succeeded
