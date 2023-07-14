@@ -60,26 +60,32 @@
   ignore_errors: yes
   when: ansible_os_family == "RedHat"
 
-- name: Check if the nvme and pci drivers are present in all images
-  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep {{ item }}
-  register: check_nvme_pci_allimages
-  with_items:
-    - nvme
-    - pci    
+- name: Check if the nvme driver is present in all images
+  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep nvme
+  register: check_nvme_allimages
 
 - debug:
-    var: check_nvme_pci_allimages.results  
+    var: check_nvme_allimages
 
 - name: "Write to error msg if some drivers are not present"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n NVME validation failed since driver is not present. "
+    line: "\n NVME validation failed since nvme driver is not present. "
     create: yes
     state: present 
-  when: ("nvme" not in check_nvme_pci_allimages.results[0].stdout) or ("pci" not in check_nvme_pci_allimages.results[1].stdout) 
+  when: ("nvme" not in check_nvme_allimages.stdout)
 
-- name: "Get list of missing drivers required for nvme validation"
-  set_fact: missing_drivers="{{ check_nvme_pci_allimages.results | json_query(jmesquery)}}"
-  vars:
-    jmesquery: '[?rc==`1`].stdout'
-  when: check_nvme_pci_allimages is not succeeded
+- name: Check if the pci driver is present in all images
+  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep pci
+  register: check_pci_allimages
+
+- debug:
+    var: check_pci_allimages
+
+- name: "Write to error msg if some drivers are not present"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n PCI validation failed since pci driver is not present. "
+    create: yes
+    state: present 
+  when: ("pci" not in check_pci_allimages.stdout)         
