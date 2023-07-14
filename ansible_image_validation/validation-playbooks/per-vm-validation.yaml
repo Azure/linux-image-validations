@@ -85,7 +85,7 @@
 - name: "Write to error msg if some drivers are not present"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n PCI validation failed since pci driver is not present. "
+    line: "\n NVME validation failed since pci driver is not present. "
     create: yes
     state: present 
   when: ("pci" not in check_pci_allimages.stdout)         
