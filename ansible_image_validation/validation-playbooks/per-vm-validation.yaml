@@ -65,12 +65,12 @@
   register: check_nvme_allimages
 
 - debug:
-    var: check_nvme_allimages
+    msg: "NVME Validation is successful since nvme driver is present"
 
 - name: "Write to error msg if some drivers are not present"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n NVME validation failed since nvme driver is not present. "
+    line: "\n NVME validation failed since nvme driver is not present."
     create: yes
     state: present 
   when: ("nvme" not in check_nvme_allimages.stdout)
@@ -80,7 +80,7 @@
   register: check_pci_allimages
 
 - debug:
-    var: check_pci_allimages
+    msg: "NVME Validation is successful since nvme driver is present"
 
 - name: "Write to error msg if some drivers are not present"
   lineinfile:
