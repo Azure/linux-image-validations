@@ -55,11 +55,6 @@
   ignore_errors: yes
   when: ansible_os_family == "RedHat" and (ansible_distribution_major_version == '8' or ansible_distribution_major_version == '7') and (repo_type == 'base' or repo_type =='beta')
 
-- name: Check if blacklisted drivers are blacklisted by modprobe service
-  include_tasks: validation-playbooks/blacklisted_drivers_validation.yaml
-  ignore_errors: yes
-  when: ansible_os_family == "RedHat"
-
 - name: Check if the nvme driver is present in all images
   shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep nvme
   register: check_nvme_allimages
@@ -89,3 +84,8 @@
     create: yes
     state: present 
   when: ("pci" not in check_pci_allimages.stdout)         
+
+- name: Check if blacklisted drivers are blacklisted by modprobe service
+  include_tasks: validation-playbooks/blacklisted_drivers_validation.yaml
+  ignore_errors: yes
+  when: ansible_os_family == "RedHat"
