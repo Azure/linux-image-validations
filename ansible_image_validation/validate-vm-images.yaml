@@ -10,7 +10,8 @@
   remote_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
   become: true
   vars:
-    ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
+    ansible_become_pass: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
+    is_rhui_package_present: true
 
   tasks:
     - assert:
@@ -41,13 +42,13 @@
     - name: Run per region validations for RHUI3
       include_tasks: validation-playbooks/per-region-validation.yaml
       loop: "{{ rhui3_regions }}"
-      when: item != "" and license_type != 'byos' and build_on_rhui4 == 'false'
+      when: item != "" and license_type != 'byos' and build_on_rhui4 == 'false' and is_rhui_package_present
       ignore_errors: yes
 
-    - name: Run per region validations fpr RHUI4
+    - name: Run per region validations for RHUI4
       include_tasks: validation-playbooks/per-region-validation.yaml
       loop: "{{ rhui4_regions }}"
-      when: item != "" and license_type != 'byos' and build_on_rhui4 == 'true'
+      when: item != "" and license_type != 'byos' and build_on_rhui4 == 'true' and is_rhui_package_present
       ignore_errors: yes
 
     ## ########################################################################## 
