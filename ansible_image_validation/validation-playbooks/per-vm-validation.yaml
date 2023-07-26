@@ -88,4 +88,39 @@
     line: "\n NVME validation failed since pci driver is not present. "
     create: yes
     state: present 
-  when: ("pci" not in check_pci_allimages.stdout)         
+  when: ("pci" not in check_pci_allimages.stdout)
+
+- name: Check for Rhui client package in the image
+  when: license_type != 'byos'
+  block:
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+
+  - name: Check for rhui package details
+    set_fact:
+      rhui_package: "{{ ansible_facts.packages | dict2items | selectattr('key', 'match', 'rhui-azure-rhel') }}"
+
+  - name: Check for rhui package count
+    set_fact:
+      rhui_package_count : "{{ rhui_package | count }}"
+
+  - name: Check for rhui package details
+    debug:
+      var: "{{ item }}"
+    with_items:
+      - rhui_package
+      - rhui_package_count
+
+  - name: Log error in case rhui package isn't installed
+    lineinfile:
+      path: "{{err_folder}}/err_msgs.log"
+      line: "Rhui Client package is not installed in the image"
+      create: yes
+      state: present
+    when: rhui_package_count == "0"
+
+  - name: Set the variable if rhui client package is not present
+    set_fact:
+      is_rhui_package_present : false
+    when: rhui_package_count == "0"
