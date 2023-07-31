@@ -10,8 +10,8 @@
   remote_user: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
   become: true
   vars:
-    ansible_become_pass: "{{ lookup('env', 'ADMIN_USER_NAME') }}"
-    is_rhui_package_present: true
+    ansible_become_pass: "{{ lookup('env', 'ADMIN_PASSWORD') }}"
+    is_rhui_package_present: false
 
   tasks:
     - assert:
