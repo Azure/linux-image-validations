@@ -60,35 +60,51 @@
   ignore_errors: yes
   when: ansible_os_family == "RedHat"
 
-- name: Check if the nvme driver is present in all images
-  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep nvme
-  register: check_nvme_allimages
+- name: Check if the initramfs file is present
+  stat: path=/boot/initramfs-{{ ansible_facts.kernel }}.img
+  register: initramfs_present
+  when: isCVM is false
 
-- debug:
-    var: check_nvme_allimages
-
-- name: "Write to error msg if some drivers are not present"
+- name: "Write to error msg if initramfs files are not present"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n NVME validation failed since nvme driver is not present. "
+    line: "\n boot validation failed since initramfs file is not present."
     create: yes
     state: present 
-  when: ("nvme" not in check_nvme_allimages.stdout)
+  when: isCVM is false and initramfs_present.stat.exists == false
 
-- name: Check if the pci driver is present in all images
-  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep pci
-  register: check_pci_allimages
+- name: Check for NVME/PCI Drivers in image
+  when: isCVM is false and initramfs_present.stat.exists == true
+  block:
+  - name: Check if the nvme driver is present in all images
+    shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep nvme
+    register: check_nvme_allimages
 
-- debug:
-    var: check_pci_allimages
+  - debug:
+      var: check_nvme_allimages
 
-- name: "Write to error msg if some drivers are not present"
-  lineinfile:
-    path: "{{err_folder}}/err_msgs.log"
-    line: "\n NVME validation failed since pci driver is not present. "
-    create: yes
-    state: present 
-  when: ("pci" not in check_pci_allimages.stdout)
+  - name: "Write to error msg if some drivers are not present"
+    lineinfile:
+      path: "{{err_folder}}/err_msgs.log"
+      line: "\n NVME validation failed since nvme driver is not present. "
+      create: yes
+      state: present 
+    when: ("nvme" not in check_nvme_allimages.stdout)
+
+  - name: Check if the pci driver is present in all images
+    shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep pci
+    register: check_pci_allimages
+
+  - debug:
+      var: check_pci_allimages
+
+  - name: "Write to error msg if some drivers are not present"
+    lineinfile:
+      path: "{{err_folder}}/err_msgs.log"
+      line: "\n NVME validation failed since pci driver is not present. "
+      create: yes
+      state: present 
+    when: ("pci" not in check_pci_allimages.stdout)
 
 - name: Check for Rhui client package in the image
   when: license_type != 'byos'

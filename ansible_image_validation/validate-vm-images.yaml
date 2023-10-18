@@ -19,6 +19,7 @@
           - "offer_type is defined"
           - "rhel_version is defined"
           - "build_on_rhui4 is defined"
+          - "isCVM is defined"
 
     - set_fact:
         rhui3_regions: "{{ lookup('file', 'files/rhui3-regions').split() }}"
