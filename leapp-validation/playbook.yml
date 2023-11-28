@@ -1,0 +1,79 @@
+---
+
+- hosts: localhost
+  gather_facts: False
+  tasks:
+    - assert:
+        that:
+          - "upgrade_path is defined"
+
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+
+    - name: Add entries to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ host }} {{ dns }}"
+        state: present
+
+    - name: Ensure latest client package of RHUI is present
+      shell: |
+        yum clean all
+        yum update -q -y --disablerepo='*' --enablerepo='*microsoft-azure*'
+
+    - name: Install leapp package for vanilla RHEL7 or RHEL8
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - "leapp-rhui-azure"
+      when: upgrade_path == "vanilla"
+
+    - name: Install leapp package for SAP RHEL7
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - "leapp-rhui-azure-sap"
+        - "leapp-upgrade"
+      when: upgrade_path is search("sap")  and ansible_distribution_major_version == "7"
+
+    - name: Configure leapp for RHEL8 sap
+      shell: |
+        sed -i s/^AllowZoneDrifting=.*/AllowZoneDrifting=no/ /etc/firewalld/firewalld.conf
+      when: upgrade_path is search("sap") and ansible_distribution_major_version == "8"
+      ignore_errors: yes
+
+    - name: Remove pata_acpi for RHEL 7 distributions
+      command: rmmod pata_acpi
+      when: ansible_distribution_major_version == "7"
+      ignore_errors: yes
+
+    - name: Configure leapp
+      shell: |
+        sudo sed -i 's/#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
+        wget -O /tmp/leapp.tar.gz "<SAP>
+        tar -xzf /tmp/leapp.tar.gz -C /etc/leapp/files && rm -rf leapp.tar.gz
+        leapp answer --section remove_pam_pkcs11_module_check.confirm=True --add
+      register: command_output
+
+    - name: Run preupgrade
+      command:  leapp preupgrade --no-rhsm
+      register: command_output
+      when: upgrade_path == "vanilla"
+
+    - name: Run preupgrade
+      command:  leapp preupgrade --no-rhsm --channel e4s
+      register: command_output
+      when: upgrade_path == "sap-ha"
+
+    - name: Run preupgrade
+      command:  leapp preupgrade --no-rhsm --channel eus
+      register: command_output
+      when: upgrade_path == "sapapps"
+
+    - name: Display command output
+      debug:
+        var: command_output.stdout
