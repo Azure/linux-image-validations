@@ -140,3 +140,38 @@
     set_fact:
       is_rhui_package_present : true
     when: rhui_package_count != "0"
+
+
+- name: Check for the Accelerated Networking in Rhel 9 Images.
+  when: isCVM is false and 
+  block:
+  - name: Check if the unmanaged devices are present network config of all Rhel 9 Images
+    shell: NetworkManager --print-config
+    register: check_network_config
+
+  - debug:
+      var: check_network_config
+
+  - name: "Write to error msg if t"
+    lineinfile:
+      path: "{{err_folder}}/err_msgs.log"
+      line: "\n Accelerated Networking Validation failed . "
+      create: yes
+      state: present 
+    when: ("nvme" not in check_network_config.stdout)    
+
+
+  - name: Check if the unmanaged devices config file is present in all Rhel 9 Images
+    shell: cat /etc/NetworkManager/conf.d/99-azure-unmanaged-devices.conf
+    register: check_99_azure_unmanaged_devices_config_file
+
+  - debug:
+      var: check_99_azure_unmanaged_devices_config_file
+
+  - name: "Write to error msg if some drivers are not present"
+    lineinfile:
+      path: "{{err_folder}}/err_msgs.log"
+      line: "\n Validation failed since unmanaged config file is not present. "
+      create: yes
+      state: present 
+    when: ("nvme" not in check_99_azure_unmanaged_devices_config_file.stdout)    
