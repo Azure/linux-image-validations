@@ -158,7 +158,7 @@
       line: "\n Accelerated Networking Validation failed . "
       create: yes
       state: present 
-    when: ("nvme" not in check_network_config.stdout)    
+    when: ("driver:mlx4_core;driver:mlx5_core" not in check_network_config.stdout)    
 
 
   - name: Check if the unmanaged devices config file is present in all Rhel 9 Images
@@ -174,4 +174,4 @@
       line: "\n Validation failed since unmanaged config file is not present. "
       create: yes
       state: present 
-    when: ("nvme" not in check_99_azure_unmanaged_devices_config_file.stdout)    
+    when: ("driver:mlx4_core;driver:mlx5_core" not in check_99_azure_unmanaged_devices_config_file.stdout)    
