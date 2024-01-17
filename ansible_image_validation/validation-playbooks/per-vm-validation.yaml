@@ -143,7 +143,7 @@
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
-  when: isCVM is false and 
+  when: isCVM is false and ansible_distribution_major_version == '9'
   block:
   - name: Check if the unmanaged devices are present network config of all Rhel 9 Images
     shell: NetworkManager --print-config
@@ -155,13 +155,13 @@
   - name: "Write to error msg if t"
     lineinfile:
       path: "{{err_folder}}/err_msgs.log"
-      line: "\n Accelerated Networking Validation failed . "
+      line: "\n Accelerated Networking Validation failed."
       create: yes
       state: present 
     when: ("driver:mlx4_core;driver:mlx5_core" not in check_network_config.stdout)    
 
 
-  - name: Check if the unmanaged devices config file is present in all Rhel 9 Images
+  - name: Check if the accelerated networking config file is present in all Rhel 9 Images
     shell: cat /etc/NetworkManager/conf.d/99-azure-unmanaged-devices.conf
     register: check_99_azure_unmanaged_devices_config_file
 
