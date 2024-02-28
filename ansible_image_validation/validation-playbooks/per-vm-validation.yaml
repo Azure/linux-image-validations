@@ -63,7 +63,6 @@
 - name: Check if the initramfs file is present
   stat: path=/boot/initramfs-{{ ansible_facts.kernel }}.img
   register: initramfs_present
-  when: isCVM is false
 
 - name: "Write to error msg if initramfs files are not present"
   lineinfile:
