@@ -141,6 +141,14 @@
       is_rhui_package_present : true
     when: rhui_package_count != "0"
 
+- name: Check for Repository Type
+  shell: rpm -qa | grep rhui
+  register: output_client_package
+  
+- name: Check for Repository Type
+  shell: sudo yum repolist
+  register: output_repolist
+
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'
   block:
