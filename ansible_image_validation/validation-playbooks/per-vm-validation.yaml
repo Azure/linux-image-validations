@@ -26,11 +26,11 @@
   when: "ansible_distribution_version != rhel_version"
 
 - name: Print the value of iscvm variable"
-  shell: echo "$isCVM"
-  register: printcvmvalue
+  shell: echo "$isCVM", "$offer_type", "$rhel_version", "$build_on_rhui4"
+  register: printvariables
 
 - debug:
-    var: printcvmvalue  
+    var: printvariables
 
 - name: Check number of users on the machine
   shell: getent passwd {1000..60000} | grep -v {{ admin_user }} | wc -l
