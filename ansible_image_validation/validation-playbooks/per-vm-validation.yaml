@@ -28,7 +28,6 @@
 - name: Print the value of iscvm variable"
   shell: echo "$isCVM"
   register: printcvmvalue
-  ignore_erros: yes
 
 - debug:
     var: printcvmvalue  
