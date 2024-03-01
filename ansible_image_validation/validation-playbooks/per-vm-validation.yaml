@@ -25,7 +25,7 @@
     state: present
   when: "ansible_distribution_version != rhel_version"
 
-- name: Print the value of iscvm variable"
+- name: Print the value of iscvm variable
   shell: echo {{isCVM}}, {{offer_type}}, {{rhel_version}}, {{build_on_rhui4}}"
   register: printvariables
 
