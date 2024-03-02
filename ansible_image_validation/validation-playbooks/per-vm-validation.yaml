@@ -71,7 +71,7 @@
 - name: Check if the initramfs file is present
   stat: path=/boot/initramfs-{{ ansible_facts.kernel }}.img
   register: initramfs_present
-  when: isCVM is false
+  when: isCVM == false
 
 - name: "Write to error msg if initramfs files are not present"
   lineinfile:
@@ -79,10 +79,10 @@
     line: "\n boot validation failed since initramfs file is not present."
     create: yes
     state: present 
-  when: isCVM is false and initramfs_present.stat.exists == false
+  when: isCVM == false and initramfs_present.stat.exists == false
 
 - name: Check for NVME/PCI Drivers in image
-  when: isCVM is false and initramfs_present.stat.exists == true
+  when: isCVM == false and initramfs_present.stat.exists == true
   block:
   - name: Check if the nvme driver is present in all images
     shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep nvme
@@ -150,7 +150,7 @@
     when: rhui_package_count != "0"
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
-  when: isCVM is false and ansible_distribution_major_version == '9'
+  when: isCVM == false and ansible_distribution_major_version == '9'
   block:
     - name: Check if the unmanaged devices are present network config of all Rhel 9 Images
       shell: NetworkManager --print-config
