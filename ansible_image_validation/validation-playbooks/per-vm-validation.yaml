@@ -156,11 +156,11 @@
     fi
   register: output_offertype
 
-- name: "Write to error msg if the file is not present"
-  lineinfile:
-    path: "./err_msgs.log"
-    line: "Incorrect client pckage according to the offertype"
-  when:     
+# - name: "Write to error msg if the file is not present"
+#   lineinfile:
+#     path: "./err_msgs.log"
+#     line: "Incorrect client pckage according to the offertype"
+#   when:     
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'
