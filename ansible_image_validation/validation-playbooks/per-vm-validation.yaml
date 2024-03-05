@@ -146,7 +146,7 @@
     register: output_client_package
     
   - debug:
-    var: output_client_package
+      var: output_client_package
 
   # - name: Create a List of repo_types and print it
   #   set_fact: 
