@@ -141,6 +141,7 @@
       is_rhui_package_present : true
     when: rhui_package_count != "0"
 
+
   - name: Check for Repository Type
     shell: rpm -qa | grep rhui
     register: output_client_package
@@ -148,26 +149,27 @@
   - debug:
       var: output_client_package
 
-  # - name: Create a List of repo_types and print it
-  #   set_fact: 
-  #     repotypes: ["beta","base","eus","sap-ha","base-sap-ha","byol","sap-apps","base-sap-apps","ha"]
+  - name: Create a List of repo_types and print it
+    set_fact: 
+      repotypes: ["beta","base","eus","sap-ha","base-sap-ha","byol","sap-apps","base-sap-apps","ha"]
 
-  - name: Check if the client package is present according to the offertype
+  - name: Check if the client package is present according to the offertype when offertype is not equal to base or byol
     shell: |
-      string= {{ offer_type }}
-      if [[ $string = 'output_client_package_stdout.lines' ]]; then
-          echo 'Correct Offertype according to client package'
-      fi
+      $string={{ offer_type }}
+      echo {{ output_client_package.stdout_lines }} | grep string      
     register: output_offertype
+    when: offer_type!='base' and offertype!='byos'
 
   - debug:
-      var: output_offertype
+      var: output_offertype.stdout_lines
 
-# - name: "Write to error msg if the file is not present"
-#   lineinfile:
-#     path: "./err_msgs.log"
-#     line: "Incorrect client pckage according to the offertype"
-#   when:     
+  # - name: Check if the client package is present according to the offertype when offertype is equal to base
+  #   shell: |
+  #     $string={{ offer_type }}
+  #     echo {{ output_client_package.stdout_lines }} | grep string      
+  #   register: output_offertype
+  #   when: offer_type!='base' and offertype!='byos'
+
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'
