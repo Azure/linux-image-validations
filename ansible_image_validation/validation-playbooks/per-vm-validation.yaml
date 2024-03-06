@@ -142,7 +142,7 @@
     when: rhui_package_count != "0"
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
-  when: ansible_distribution_major_version == '9'
+  when: isCVM is false and ansible_distribution_major_version == '9'
   block:
     - name: Check if the unmanaged devices are present network config of all Rhel 9 Images
       shell: NetworkManager --print-config
