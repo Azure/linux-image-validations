@@ -156,20 +156,29 @@
   - name: Check if the client package is present according to the offertype when offertype is not equal to base or byol
     shell: |
       $string={{ offer_type }}
-      echo {{ output_client_package.stdout_lines }} | grep string      
+      echo {{ output_client_package.stdout_lines[0] }} | grep string      
     register: output_offertype
     when: offer_type!='base' and offertype!='byos'
 
   - debug:
-      var: output_offertype.stdout_lines
+      var: output_offertype
 
-  # - name: Check if the client package is present according to the offertype when offertype is equal to base
-  #   shell: |
-  #     $string={{ offer_type }}
-  #     echo {{ output_client_package.stdout_lines }} | grep string      
-  #   register: output_offertype
-  #   when: offer_type!='base' and offertype!='byos'
+  - name: print3
+    shell: |
+        echo {{repotypes}}
+        for repo in {{repotypes}};
+        do
+          z=$(echo {{output.stdout_lines[0]}} | grep $repo)
+          if [[-z $z]];
+          then
+            echo "correct offertype"
+          fi
+        done
+    register: output3
+    when: offer_type =='base' 
 
+  - debug:
+      var: output_check_base_ofertype                                                                                                                                                                                                                                     ~                                                                                                                                                                                                                                            ~                        
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'
