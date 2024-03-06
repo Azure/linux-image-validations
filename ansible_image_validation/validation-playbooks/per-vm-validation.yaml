@@ -158,7 +158,7 @@
       $string={{ offer_type }}
       echo {{ output_client_package.stdout_lines[0] }} | grep string      
     register: output_offertype
-    when: offer_type!='base' and offertype!='byos'
+    when: offer_type!='base' and offer_type!='byos'
 
   - debug:
       var: output_offertype
