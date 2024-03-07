@@ -155,30 +155,34 @@
 
   - name: Check if the client package is present according to the offertype when offertype is not equal to base or byol
     shell: |
-      string={{ offer_type }}
-      echo {{ output_client_package.stdout_lines[0] }} | grep $string      
-    register: output_offertype
+      repo={{ offer_type }}
+      check_if_null=$(echo {{ output_client_package.stdout_lines[0] }} | grep $repo)
+      if [[-z $check_if_null]];
+          then
+            echo "Incorrect Client Package according to the offertype"
+      fi      
+    register: output_offertype_except_base_and_byos
     when: offer_type!='base' and offer_type!='byos'
 
   - debug:
-      var: output_offertype
+      var: output_offertype_except_base_and_byos
 
-  - name: print3
+  - name: Check if the client package is present according to the offertype when offertype is equal to base
     shell: |
         echo {{repotypes}}
         for repo in {{repotypes}};
         do
-          z=$(echo {{output_client_package.stdout_lines[0]}} | grep $repo)
-          if [[-z $z]];
+          check_if_null=$(echo {{output_client_package.stdout_lines[0]}} | grep $repo)
+          if [[-n $check_if_null]];
           then
-            echo "correct offertype"
+            echo "Incorrect Client Package according to base offertype"
           fi
         done
-    register: output_check_base_ofertype  
+    register: output_check_base_offertype  
     when: offer_type =='base' 
 
   - debug:
-      var: output_check_base_ofertype                                                                                                                                                                                                                                     ~                                                                                                                                                                                                                                            ~                        
+      var: output_check_base_offertype                                                                                                                                                                                                                                   ~                                                                                                                                                                                                                                            ~                        
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'
