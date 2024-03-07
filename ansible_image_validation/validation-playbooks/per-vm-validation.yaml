@@ -141,24 +141,26 @@
       is_rhui_package_present : true
     when: rhui_package_count != "0"
 
+  - name: Check if offertype is equal to byol
+    lineinfile:
+      path: "{{err_folder}}/err_msgs.log"
+      line: "\n  Client Package is present in Byos Offertype Image"
+      create: yes
+      state: present 
+    when: offer_type =='byos' and rhui_package_count != "0"
 
-  - name: Check for Repository Type
+  - name: Check the value of client package
     shell: rpm -qa | grep rhui
     register: output_client_package
     
   - debug:
       var: output_client_package
 
-  - name: Create a List of repo_types and print it
-    set_fact: 
-      repotypes: ["beta","base","eus","sap-ha","base-sap-ha","byol","sap-apps","base-sap-apps","ha"]
-
   - name: Check if the client package is present according to the offertype when offertype is not equal to base or byol
     shell: |
       repo={{ offer_type }}
       check_if_null=$(echo {{ output_client_package.stdout_lines[0] }} | grep $repo)
-      if [[-z $check_if_null]];
-          then
+      if [[ -z $check_if_null ]]; then
             echo "Incorrect Client Package according to the offertype"
       fi      
     register: output_offertype_except_base_and_byos
@@ -167,19 +169,30 @@
   - debug:
       var: output_offertype_except_base_and_byos
 
+  - name: "Write to error msg if incorrect client package is present according to the offertype"
+    lineinfile:
+      path: "{{err_folder}}/err_msgs.log"
+      line: "\n Incorrect Client Package is present according to the offertype."
+      create: yes
+      state: present 
+    when: ("Incorrect Client Package according to the offertype" in output_offertype_except_base_and_byos) 
+
   - name: Check if the client package is present according to the offertype when offertype is equal to base
     shell: |
-        echo {{repotypes}}
-        for repo in {{repotypes}};
+        repotypes=("beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
+        for repo in "${repotypes[@]}"
         do
-          check_if_null=$(echo {{output_client_package.stdout_lines[0]}} | grep $repo)
-          if [[-n $check_if_null]];
-          then
-            echo "Incorrect Client Package according to base offertype"
-          fi
+            check_base_client_pkg=$(echo $pkg | grep $repo)
+            echo -e "$check_client_pkg\n"
+            if [[ -n $check_client_pkg ]]; then
+                echo "Incorrect Client Package is present in Base Offertype Image"
+            fi
         done
     register: output_check_base_offertype  
     when: offer_type =='base'                                                                                                                                                                                                                             ~                                                                                                                                                                                                                                            ~                        
+
+  - debug:
+      var: output_check_base_offertype  
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
