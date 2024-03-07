@@ -179,10 +179,8 @@
           fi
         done
     register: output_check_base_offertype  
-    when: offer_type =='base' 
+    when: offer_type =='base'                                                                                                                                                                                                                             ~                                                                                                                                                                                                                                            ~                        
 
-  - debug:
-      var: output_check_base_offertype                                                                                                                                                                                                                                   ~                                                                                                                                                                                                                                            ~                        
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'
