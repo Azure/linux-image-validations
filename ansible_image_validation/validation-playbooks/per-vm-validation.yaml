@@ -168,13 +168,13 @@
         echo {{repotypes}}
         for repo in {{repotypes}};
         do
-          z=$(echo {{output.stdout_lines[0]}} | grep $repo)
+          z=$(echo {{output_client_package.stdout_lines[0]}} | grep $repo)
           if [[-z $z]];
           then
             echo "correct offertype"
           fi
         done
-    register: output3
+    register: output_check_base_ofertype  
     when: offer_type =='base' 
 
   - debug:
