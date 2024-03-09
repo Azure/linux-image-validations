@@ -161,9 +161,7 @@
 - name: Check if the client package is present according to the offertype when offertype is not equal to base or byol
   shell: |
     repo={{ offer_type }}
-    repo2= {{ repo_type }}
     echo "$repo/n"
-    echo "repo2/n"
     check_if_null=$(echo {{ output_client_package.stdout_lines[0] }} | grep "$repo" )
     if [[ -z $check_if_null ]]; then
           echo "Incorrect Client Package according to the offertype"
@@ -182,9 +180,9 @@
     state: present 
   when: ("Incorrect Client Package according to the offertype" in output_offertype_except_base_and_byos) and ( offer_type!='base' and offer_type!='byos')
 
-- name: check condition offer_type == base
+- name: Check Condition offer_type == base
   ansible.builtin.debug:
-    var: offer_type =='base'      
+    var: offer_type == 'base'      
 
 - name: Check if the client package is present according to the offertype when offertype is equal to base
   shell: |
@@ -199,10 +197,20 @@
           fi
       done
   register: output_check_base_offertype  
-  # when: offer_type =='base'                                                                                                                                                                                                                             ~                                                                                                                                                                                                                                            ~                        
+  when: ( offer_type == 'base')                                                                                                                                                                                                                           ~                                                                                                                                                                                                                                            ~                        
 
 - debug:
     var: output_check_base_offertype  
+
+
+- name: "Write to error msg if incorrect client package is present according to base the offertype"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n Incorrect Client Package is present according to the base offertype."
+    create: yes
+    state: present 
+  when: ("Incorrect Client Package is present in Base Offertype Image" in output_check_base_offertype) and ( offer_type == 'base')
+
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'
