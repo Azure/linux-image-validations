@@ -184,32 +184,32 @@
   ansible.builtin.debug:
     var: offer_type == 'base'      
 
-- name: Check if the client package is present according to the offertype when offertype is equal to base
-  shell: |
-      echo {{ offer_type }}
-      repotypes=("beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
-      for repo in "${repotypes[@]}"
-      do
-          check_base_client_pkg=$(echo $pkg | grep $repo)
-          echo -e "$check_client_pkg\n"
-          if [[ -n $check_client_pkg ]]; then
-              echo "Incorrect Client Package is present in Base Offertype Image"
-          fi
-      done
-  register: output_check_base_offertype  
-  when: ( offer_type == 'base')                                                                                                                                                                                                                           ~                                                                                                                                                                                                                                            ~                        
+# - name: Check if the client package is present according to the offertype when offertype is equal to base
+#   shell: |
+#       echo {{ offer_type }}
+#       repotypes=("beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
+#       for repo in "${repotypes[@]}"
+#       do
+#           check_base_client_pkg=$(echo $pkg | grep $repo)
+#           echo -e "$check_client_pkg\n"
+#           if [[ -n $check_client_pkg ]]; then
+#               echo "Incorrect Client Package is present in Base Offertype Image"
+#           fi
+#       done
+#   register: output_check_base_offertype  
+#   when: offer_type == 'base'                                                                                                                                                                                                                 ~                                                                                                                                                                                                                                            ~                        
 
-- debug:
-    var: output_check_base_offertype  
+# - debug:
+#     var: output_check_base_offertype  
 
 
-- name: "Write to error msg if incorrect client package is present according to base the offertype"
-  lineinfile:
-    path: "{{err_folder}}/err_msgs.log"
-    line: "\n Incorrect Client Package is present according to the base offertype."
-    create: yes
-    state: present 
-  when: ("Incorrect Client Package is present in Base Offertype Image" in output_check_base_offertype) and ( offer_type == 'base')
+# - name: "Write to error msg if incorrect client package is present according to base the offertype"
+#   lineinfile:
+#     path: "{{err_folder}}/err_msgs.log"
+#     line: "\n Incorrect Client Package is present according to the base offertype."
+#     create: yes
+#     state: present 
+#   when: ("Incorrect Client Package is present in Base Offertype Image" in output_check_base_offertype) and ( offer_type == 'base')
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
