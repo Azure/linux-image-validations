@@ -107,7 +107,7 @@
     when: ("pci" not in check_pci_allimages.stdout)
 
 - name: Check for Rhui client package in the image
-  when: license_type != 'byos'
+  when: license_type != 'byol'
   block:
   - name: Gather the package facts
     ansible.builtin.package_facts:
@@ -146,10 +146,10 @@
 - name: Check if offertype is equal to byol
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n  Client Package is present in Byos Offertype Image"
+    line: "\n  Client Package is present in byol Offertype Image"
     create: yes
     state: present 
-  when: offer_type =='byos' and rhui_package_count != "0"
+  when: offer_type =='byol' and rhui_package_count != "0"
 
 - name: Check the value of client package
   shell: rpm -qa | grep rhui
@@ -166,11 +166,11 @@
     if [[ -z $check_if_null ]]; then
           echo "Incorrect Client Package according to the offertype"
     fi      
-  register: output_offertype_except_base_and_byos
-  when: offer_type!='base' and offer_type!='byos'
+  register: output_offertype_except_base_and_byol
+  when: offer_type!='base' and offer_type!='byol'
 
 - debug:
-    var: output_offertype_except_base_and_byos
+    var: output_offertype_except_base_and_byol
 
 - name: "Write to error msg if incorrect client package is present according to the offertype"
   lineinfile:
@@ -178,7 +178,7 @@
     line: "\n Incorrect Client Package is present according to the offertype."
     create: yes
     state: present 
-  when: ("Incorrect Client Package according to the offertype" in output_offertype_except_base_and_byos) and ( offer_type!='base' and offer_type!='byos')
+  when: ("Incorrect Client Package according to the offertype" in output_offertype_except_base_and_byol) and ( offer_type!='base' and offer_type!='byol')
 
 - name: Check Condition offer_type == base
   ansible.builtin.debug:
