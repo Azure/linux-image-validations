@@ -161,28 +161,27 @@
 
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol
   shell: |
-    repo={{ offer_type }}
-    echo "$repo/n"
-    if [[ offertype -ne "base" ]]; then 
+    if [[ {{ offertype }} -ne "base" ]]; then 
         check_if_null=$(echo {{ output_client_package.stdout_lines[0] }} | grep "$repo" )
         if [[ -z $check_if_null ]]; then
-              echo "Incorrect Client Package according to the offertype"
+              echo "Incorrect Client Package according to the {{ offertype }}"
         fi  
 
     else
-        echo "{{ offer_type }}"
         repotypes=("beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
+        echo "Iterate through the list repotypes: "
+        echo $repotypes
         for repo in "${repotypes[@]}"
         do
             check_base_client_pkg=$(echo {{ output_client_package.stdout_lines[0] }} | grep "$repo")
             echo -e "$check_base_client_pkg\n"
             if [[ -n $check_base_client_pkg ]]; then
-                echo "Incorrect Client Package is present in Base Offertype Image"
+                echo "Incorrect Client Package according to the {{ offertype }}"
             fi
         done    
     fi    
   register: output_offertype_except_byol
-  when: offer_type!='byol'
+  when: offer_type !='byol'
 
 - debug:
     var: output_offertype_except_byol
@@ -193,11 +192,7 @@
     line: "\n Incorrect Client Package is present according to the offertype."
     create: yes
     state: present 
-  when: ("Incorrect Client Package according to the offertype" in output_offertype_except_byol) and ( offer_type!='byol')
-
-- name: Check Condition offer_type == base
-  ansible.builtin.debug:
-    var: offer_type == 'base'      
+  when: ("Incorrect Client Package according to the {{ offertype }}" in output_offertype_except_byol) and ( offer_type!='byol')
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
