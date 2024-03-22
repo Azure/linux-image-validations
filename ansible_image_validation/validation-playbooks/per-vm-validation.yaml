@@ -107,7 +107,7 @@
     when: ("pci" not in check_pci_allimages.stdout)
 
 - name: Check for Rhui client package in the image
-  when: license_type != 'byos'
+  when: license_type != 'byol'
   block:
   - name: Gather the package facts
     ansible.builtin.package_facts:
@@ -140,6 +140,60 @@
     set_fact:
       is_rhui_package_present : true
     when: rhui_package_count != "0"
+
+##Repo Validation Task
+
+- name: Check if offertype is equal to byol
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n  Client Package is present in byol Offertype Image"
+    create: yes
+    state: present 
+  when: offer_type =='byol' and rhui_package_count != "0"
+  
+- name: Check the value of client package
+  shell: rpm -qa | grep rhui
+  register: output_client_package
+  when: offer_type!='byol'
+
+- debug:
+    var: output_client_package
+
+- name: Check if the client package is present according to the offertype when offertype is not equal to byol
+  shell: |
+    if [[ {{ offertype }} -ne "base" ]]; then 
+        check_if_null=$(echo {{ output_client_package.stdout_lines[0] }} | grep "$repo" )
+        if [[ -z $check_if_null ]]; then
+              echo "Incorrect Client Package according to the {{ offertype }}"
+        fi  
+
+    else
+        repotypes=("beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
+        echo "Iterate through the list repotypes: "
+        echo $repotypes
+        for repo in "${repotypes[@]}"
+        do
+            check_base_client_pkg=$(echo {{ output_client_package.stdout_lines[0] }} | grep "$repo")
+            echo -e "$check_base_client_pkg\n"
+            if [[ -n $check_base_client_pkg ]]; then
+                echo "Incorrect Client Package according to the {{ offertype }}"
+            fi
+        done    
+    fi    
+  register: output_offertype_except_byol
+  when: offer_type !='byol'
+
+- debug:
+    var: output_offertype_except_byol
+
+- name: "Write to error msg if incorrect client package is present according to the offertype"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n Incorrect Client Package is present according to the offertype."
+    create: yes
+    state: present 
+  when: ("Incorrect Client Package according to the {{ offertype }}" in output_offertype_except_byol) and ( offer_type!='byol')
+
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'
