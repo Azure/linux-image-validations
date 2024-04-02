@@ -134,7 +134,7 @@
       line: "Rhui Client package is not installed in the image"
       create: yes
       state: present
-    when: rhui_package_count == "0"
+    when: rhui_package_count == "0" and offer_type !='byol'
 
   - name: Set the variable if rhui client package is found
     set_fact:
@@ -143,14 +143,14 @@
 
 ##Repo Validation Task
 
-- name: Check if offertype is equal to byol
+- name: Check if offertype is equal to byol and client package is present
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
     line: "\n  Client Package is present in byol Offertype Image"
     create: yes
     state: present 
   when: offer_type =='byol' and rhui_package_count != "0"
-  
+
 - name: Check the value of client package
   shell: rpm -qa | grep rhui
   register: output_client_package
