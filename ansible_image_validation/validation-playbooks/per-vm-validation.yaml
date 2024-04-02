@@ -161,22 +161,21 @@
 
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol
   shell: |
-    if [[ {{ offertype }} -ne "base" ]]; then 
-        check_if_null=$(echo {{ output_client_package.stdout_lines[0] }} | grep "$repo" )
+    if [[ {{ offer_type }} -ne "base" ]]; then 
+        check_if_null=$(echo {{ output_client_package.stdout_lines[0] }} | grep "{{ offer_type }}" )
         if [[ -z $check_if_null ]]; then
-              echo "Incorrect Client Package according to the {{ offertype }}"
+              echo "Incorrect Client Package according to the {{ offer_type }}"
         fi  
 
     else
-        repotypes=("beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
+        repotypes=( "beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
         echo "Iterate through the list repotypes: "
-        echo $repotypes
         for repo in "${repotypes[@]}"
         do
             check_base_client_pkg=$(echo {{ output_client_package.stdout_lines[0] }} | grep "$repo")
             echo -e "$check_base_client_pkg\n"
             if [[ -n $check_base_client_pkg ]]; then
-                echo "Incorrect Client Package according to the {{ offertype }}"
+                echo "Incorrect Client Package according to the {{ offer_type }}"
             fi
         done    
     fi    
@@ -192,7 +191,7 @@
     line: "\n Incorrect Client Package is present according to the offertype."
     create: yes
     state: present 
-  when: ("Incorrect Client Package according to the {{ offertype }}" in output_offertype_except_byol) and ( offer_type!='byol')
+  when: ("Incorrect Client Package according to the {{ offer_type }}" in output_offertype_except_byol) and ( offer_type!='byol')
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
