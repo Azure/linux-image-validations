@@ -164,7 +164,7 @@
     if [[ {{ offer_type }} -ne "base" ]]; then 
         check_if_null=$(echo {{ output_client_package.stdout_lines[0] }} | grep "{{ offer_type }}" )
         if [[ -z $check_if_null ]]; then
-              echo "Incorrect Client Package according to the {{ offer_type }}"
+              echo "Incorrect Client Package according to the given offertype"
         fi  
 
     else
@@ -175,7 +175,7 @@
             check_base_client_pkg=$(echo {{ output_client_package.stdout_lines[0] }} | grep "$repo")
             echo -e "$check_base_client_pkg\n"
             if [[ -n $check_base_client_pkg ]]; then
-                echo "Incorrect Client Package according to the {{ offer_type }}"
+                echo "Incorrect Client Package according to the given offertype"
             fi
         done    
     fi    
@@ -191,7 +191,7 @@
     line: "\n Incorrect Client Package is present according to the offertype."
     create: yes
     state: present 
-  when: ("Incorrect Client Package according to the {{ offer_type }}" in output_offertype_except_byol) and ( offer_type!='byol')
+  when: ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol) and ( offer_type!='byol')
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
