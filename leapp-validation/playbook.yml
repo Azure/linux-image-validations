@@ -57,7 +57,14 @@
         wget -O /tmp/leapp.tar.gz "<SAP>
         tar -xzf /tmp/leapp.tar.gz -C /etc/leapp/files && rm -rf leapp.tar.gz
         leapp answer --section remove_pam_pkcs11_module_check.confirm=True --add
-      register: command_output
+
+    # - name: Configure leapp
+    #   shell: |
+    #     sudo sed -i 's/#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
+    #     wget -O /tmp/leapp.tar.gz "https://ahbv3sa.blob.core.windows.net/testfiles/leapp-data-22%20(1).tar.gz?sp=r&st=2024-01-16T07:02:38Z&se=2024-01-16T15:02:38Z&spr=https&sv=2022-11-02&sr=b&sig=W7hoGSbHIN0eO08BB5hI3qtsf08Qy9BmK1IIgio1avk%3D"
+    #     tar -xzf /tmp/leapp.tar.gz -C /etc/leapp/files && rm -rf leapp.tar.gz
+    #     leapp answer --section remove_pam_pkcs11_module_check.confirm=True --add
+    #   register: command_output
 
     - name: Run preupgrade
       command:  leapp preupgrade --no-rhsm
