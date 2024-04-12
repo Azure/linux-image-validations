@@ -170,8 +170,8 @@
   ansible.builtin.shell:
     cmd: |
       client_package={{ output_client_package.stdout_lines[0] }}
-      if [[ {{ offer_type }} -eq "base" ]]; then 
-            original_length=${#client_package}
+      if [[ {{ offer_type }} == "base" ]]; then 
+            original_length=`echo -n "$client_package"|wc -c`
             substring="${client_package:0:$((original_length - 15))}"
             echo "Original string: $client_package"
             echo "Trimmed string: '$substring'"
@@ -181,7 +181,7 @@
                   echo "Incorrect Client Package according to the given offertype"
             fi  
       else
-            original_length=${#client_package}
+            original_length=`echo -n "$client_package"|wc -c`
             substring="${client_package:0:$((original_length - 15))}"
             echo "Original string: $client_package"
             echo "Trimmed string: '$substring'"
@@ -217,8 +217,8 @@
 # - name: Check if the client package is present according to the offertype when offertype is not equal to byol and the architecture is arm64.
 #   shell: |
 #     client_package={{ output_client_package.stdout_lines[0] }}
-#     if [[ {{ offer_type }} -eq "base" ]]; then 
-#           original_length=${#client_package}
+#     if [[ {{ offer_type }} == "base" ]]; then 
+#           original_length=`echo -n "$client_package"|wc -c`
 #           substring="${client_package:0:$((original_length - 15))}"
 #           echo "Original string: $client_package"
 #           echo "Trimmed string: '$substring'"
@@ -231,7 +231,7 @@
 #                 echo "Incorrect Client Package according to the given offertype"
 #           fi  
 #     else
-#           original_length=${#client_package}
+#           original_length=`echo -n "$client_package"|wc -c`
 #           substring="${client_package:0:$((original_length - 21))}"
 #           echo "Original string: $client_package"
 #           echo "Trimmed string: '$substring'"
