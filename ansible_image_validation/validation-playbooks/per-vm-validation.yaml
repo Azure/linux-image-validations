@@ -232,6 +232,8 @@
                 if [[ "${client_package:i:1}" =~ ^[0-9]+$ ]]; then
                       break;
                 else
+                      echo "Debug statement"
+                      echo "${client_package:i:1}"
                       offer_within_clientpkg="${offer_within_clientpkg}${client_package:i:1}"
                 fi  
             done 
