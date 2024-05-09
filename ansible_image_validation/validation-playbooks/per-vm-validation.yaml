@@ -159,38 +159,28 @@
 - debug:
     var: output_client_package
 
-
-## Example CLient Package: rhui-azure-rhel9-base-sap-apps-2.3-635.noarch
-## First 17 letters: rhui-azure-rhel9-
-## Last 15 letters:-2.3-635.noarch
-## offer type vallue is base-sap-apps
-## for base offertype, it should return null
-
-- name: Check if the client package is present according to the offertype when offertype is not equal to byol and the architecture is x86-64.
+- name: Check if the client package is present according to the offertype when offertype is not equal to byol.
   ansible.builtin.shell:
     cmd: |
       client_package={{ output_client_package.stdout_lines[0] }}
       if [[ {{ offer_type }} == "base" ]]; then 
-            original_length=`echo -n "$client_package"|wc -c`
-            substring="${client_package:0:$((original_length - 15))}"
-            echo "Original string: $client_package"
-            echo "Trimmed string: '$substring'"
-            final_string="${substring:17}"
-            echo $final_string  
-            if [[ -n $final_string  ]]; then
-                  echo "Incorrect Client Package according to the given offertype"
-            fi  
+          repotypes=("beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
+          for repo in ${repotypes[@]};
+            do
+              echo $repo
+              z=$(echo $client_package | grep $repo)
+              if [[ -n $z ]]; then
+                echo "Incorrect Client Package according to base offertype"
+              else  
+                echo ""
+              fi
+            done       
       else
-            original_length=`echo -n "$client_package"|wc -c`
-            substring="${client_package:0:$((original_length - 15))}"
-            echo "Original string: $client_package"
-            echo "Trimmed string: '$substring'"
-            final_string="${substring:17}"
-            echo $final_string
-            if [[ $final_string != {{ offer_type }}]]; then
+            if [[ "$client_package" == *"{{ offer_type }}"* ]]; then
+                 echo "Correct Client Package according to the given offertype"
+            else
                 echo "Incorrect Client Package according to the given offertype"
             fi
-          done    
       fi    
   register: output_offertype_except_byol
   when: offer_type !='byol' 
@@ -205,56 +195,6 @@
     create: yes
     state: present 
   when: ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol) and ( offer_type!='byol')
-
-
-
-## Example CLient Package for arm64 based architecture: rhui-azure-rhel9-arm64-2.3-635.noarch, rhui-azure-rhel9-eus-arm64-2.3-635.noarch
-## First 17 letters: rhui-azure-rhel9-
-## Last 21 letters:-arm64-2.3-635.noarch
-## offer type vallue is base
-## for base offertype, it should return null
-
-# - name: Check if the client package is present according to the offertype when offertype is not equal to byol and the architecture is arm64.
-#   shell: |
-#     client_package={{ output_client_package.stdout_lines[0] }}
-#     if [[ {{ offer_type }} == "base" ]]; then 
-#           original_length=`echo -n "$client_package"|wc -c`
-#           substring="${client_package:0:$((original_length - 15))}"
-#           echo "Original string: $client_package"
-#           echo "Trimmed string: '$substring'"
-#           final_string="${substring:17}"
-#           echo $final_string  
-#           if [[ $final_string != "arm64" ]]; then
-#                 echo "Incorrect Client Package according to the given offertype"
-#           fi  
-#           elif [[ -z $check_if_null ]]; then
-#                 echo "Incorrect Client Package according to the given offertype"
-#           fi  
-#     else
-#           original_length=`echo -n "$client_package"|wc -c`
-#           substring="${client_package:0:$((original_length - 21))}"
-#           echo "Original string: $client_package"
-#           echo "Trimmed string: '$substring'"
-#           final_string="${substring:17}"
-#           echo $final_string
-#           if [[ $final_string != {{ offer_type }}]]; then
-#               echo "Incorrect Client Package according to the given offertype"
-#           fi
-#         done    
-#     fi    
-#   register: output_offertype_except_byol_arm64
-#   when: offer_type !='byol' and architecture != "x86-64"
-
-# - debug:
-#     var: output_offertype_except_byol_arm64 and architecture != "x86-64"
-
-# - name: "Write to error msg if incorrect client package is present according to the offertype"
-#   lineinfile:
-#     path: "{{err_folder}}/err_msgs.log"
-#     line: "\n Incorrect Client Package is present according to the offertype."
-#     create: yes
-#     state: present 
-#   when: ( architecture != "x86-64" ) and ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol) and ( offer_type!='byol')
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
