@@ -178,6 +178,10 @@
       else  
             offer_within_clientpkg=""
             echo "debugging"
+          for(( i=17; i<${#client_package}; i++ ));
+            do
+              offer_within_clientpkg="${offer_within_clientpkg}${client_package:i:1}"     
+            done
       fi    
   register: output_offertype_except_byol
   when: offer_type !='byol' 
