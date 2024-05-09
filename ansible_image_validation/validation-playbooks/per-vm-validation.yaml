@@ -175,7 +175,8 @@
                 echo "Correct Client Package according to the given offertype"
               fi
             done       
-      else
+      else  
+            offer_within_clientpkg=""
             echo "debugging"
       fi    
   register: output_offertype_except_byol
