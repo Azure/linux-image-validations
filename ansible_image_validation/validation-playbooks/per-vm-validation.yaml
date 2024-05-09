@@ -192,7 +192,7 @@
             echo  {{ offer_type }} 
             offervalue={{ offer_type }}
             offervalue=${offervalue//-/}
-            offer_within_clientpkg=${$offer_within_clientpkg//-/}
+            offer_within_clientpkg=${offer_within_clientpkg//-/}
             if [[ $offervalue == $offer_within_clientpkg ]]; then 
                   echo "Correct Client Package according to the given offertype"
             else
