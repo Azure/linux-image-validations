@@ -189,7 +189,11 @@
           done 
             offer_within_clientpkg="${offer_within_clientpkg%?}"
             echo $offer_within_clientpkg    
-                 
+            if [[ $offer_type == $concatenated ]]; then 
+                  echo "Correct Client Package according to the given offertype"
+            else
+                  echo "Incorrect Client Package according to the given offertype"
+            fi    
       fi    
   register: output_offertype_except_byol
   when: offer_type !='byol' 
