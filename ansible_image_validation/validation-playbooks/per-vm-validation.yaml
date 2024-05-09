@@ -186,7 +186,10 @@
               else
                     offer_within_clientpkg="${offer_within_clientpkg}${client_package:i:1}"
               fi  
-          done       
+          done 
+            offer_within_clientpkg="${offer_within_clientpkg%?}"
+            echo $offer_within_clientpkg    
+                 
       fi    
   register: output_offertype_except_byol
   when: offer_type !='byol' 
