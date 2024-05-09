@@ -178,7 +178,7 @@
       else  
           offer_within_clientpkg=""
 
-          for(( i=17; i<20; i++ )); do
+          for (( i=17; i<20; i++ )); do
               
           done
       fi    
