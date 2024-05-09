@@ -159,7 +159,14 @@
 - debug:
     var: output_client_package
 
-- name: Check if the client package is present according to the offertype when offertype is not equal to byol.
+- name: Check the value of architecture
+  shell: echo {{ architecture }}
+  register: output_architecture
+
+- debug:
+    var: output_architecture
+
+- name: Check if the client package is present according to the offertype when offertype is not equal to byol and architecture is equal to x86-64.
   ansible.builtin.shell:
     cmd: |
       #!/bin/bash
@@ -205,7 +212,7 @@
 - debug:
     var: output_offertype_except_byol 
 
-- name: "Write to error msg if incorrect client package is present according to the offertype"
+- name: "Write to error msg if incorrect client package is present according to the offertype and architecture is equal to x86-64"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
     line: "\n Incorrect Client Package {{  output_client_package.stdout_lines[0] }} is present according to the offertype {{ offer_type }}."
