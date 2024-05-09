@@ -177,7 +177,8 @@
           done       
       else  
           offer_within_clientpkg=""
-          for (( i=17; i<${#client_package}; i++  ));
+          len=${#client_package}
+          for (( i=17; i<len; i++  ));
             do
               echo $repo
               z=$(echo $client_package | grep $repo)
