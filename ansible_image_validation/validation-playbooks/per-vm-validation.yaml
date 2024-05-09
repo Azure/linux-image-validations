@@ -177,7 +177,7 @@
           done       
       else  
           offer_within_clientpkg=""
-          for repo in ${repotypes[@]};
+          for (( i=17; i<20; i++ ));
             do
               echo $repo
               z=$(echo $client_package | grep $repo)
