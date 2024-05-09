@@ -228,6 +228,8 @@
             offer_within_clientpkg=""
             len="$(echo -n "$client_package" | wc -c)"
             for (( i=17; i<len; i++  ));
+                echo "Debug statement"
+                echo "${client_package:i:1}
               do
                 if [[ "${client_package:i:1}" =~ ^[0-9]+$ ]]; then
                       break;
