@@ -159,7 +159,7 @@
 - debug:
     var: output_client_package
 
-- name: Check the value of architecture
+- name: Check the architecture of the RHEL Image.
   shell: echo {{ architecture }}
   register: output_architecture
 
@@ -207,7 +207,7 @@
             fi    
       fi    
   register: output_offertype_except_byol
-  when: offer_type !='byol' 
+  when: offer_type !='byol' and {{ architecture }} == "x86-64"
 
 - debug:
     var: output_offertype_except_byol 
@@ -218,7 +218,7 @@
     line: "\n Incorrect Client Package {{  output_client_package.stdout_lines[0] }} is present according to the offertype {{ offer_type }}."
     create: yes
     state: present 
-  when: ( offer_type!='byol') and ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol.stdout_lines)  
+  when: ( offer_type!='byol') and ( {{ architecture }} == "x86-64" ) and ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol.stdout_lines)  
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
