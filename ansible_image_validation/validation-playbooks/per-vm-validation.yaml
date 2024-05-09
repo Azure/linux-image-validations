@@ -189,7 +189,8 @@
           done 
             offer_within_clientpkg="${offer_within_clientpkg%?}"
             echo $offer_within_clientpkg    
-            if [[ $offer_type == $offer_within_clientpkg ]]; then 
+            echo  {{ offer_type }} 
+            if [[ {{ offer_type }} == $offer_within_clientpkg ]]; then 
                   echo "Correct Client Package according to the given offertype"
             else
                   echo "Incorrect Client Package according to the given offertype"
@@ -204,7 +205,7 @@
 - name: "Write to error msg if incorrect client package is present according to the offertype"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n Incorrect Client Package is present according to the offertype."
+    line: "\n Incorrect Client Package {{  output_client_package.stdout_lines[0] }} is present according to the offertype {{ offer_type }}."
     create: yes
     state: present 
   when: ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol.stdout_lines) and ( offer_type!='byol')
