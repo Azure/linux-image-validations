@@ -178,7 +178,7 @@
           done       
       else  
           offer_within_clientpkg=""
-          len=${#client_package}
+          len="${#client_package}""
           for (( i=17; i<len; i++  ));
             do
               echo $repo
