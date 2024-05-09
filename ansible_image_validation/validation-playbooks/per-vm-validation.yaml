@@ -172,7 +172,7 @@
               if [[ -n $z ]]; then
                 echo "Incorrect Client Package according to base offertype"
               else  
-                echo ""
+                echo "Correct Client Package according to the given offertype"
               fi
             done       
       else
@@ -194,7 +194,7 @@
     line: "\n Incorrect Client Package is present according to the offertype."
     create: yes
     state: present 
-  when: ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol) and ( offer_type!='byol')
+  when: ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol.stdout_lines) and ( offer_type!='byol')
 
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
