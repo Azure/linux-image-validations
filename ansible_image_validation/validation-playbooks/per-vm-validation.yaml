@@ -177,7 +177,16 @@
           done       
       else  
           offer_within_clientpkg=""
-
+          for repo in ${repotypes[@]};
+            do
+              echo $repo
+              z=$(echo $client_package | grep $repo)
+              if [[ -n $z ]]; then
+                echo "Incorrect Client Package according to the given offertype"
+              else  
+                echo "Correct Client Package according to the given offertype"
+              fi
+          done       
 
       fi    
   register: output_offertype_except_byol
