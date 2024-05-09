@@ -178,10 +178,9 @@
       else  
           offer_within_clientpkg=""
 
-          for(( i=17; i<20; i++ ));
-            do
+          for(( i=17; i<20; i++ )); do
               
-            done
+          done
       fi    
   register: output_offertype_except_byol
   when: offer_type !='byol' 
