@@ -281,7 +281,7 @@
         line: "\n Accelerated Networking Validation failed since unmanaged drivers are not present."
         create: yes
         state: present 
-      when: ("driver:mlx4_core;driver:mlx5_core" not in check_network_config.stdout_lines)    
+      when: ("unmanaged-devices=driver:mlx4_core;driver:mlx5_core" not in check_network_config.stdout_lines)    
     
     - name: Check if the accelerated networking config file is present in all Rhel 9 Images
       stat:
