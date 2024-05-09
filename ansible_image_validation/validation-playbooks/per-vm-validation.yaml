@@ -162,6 +162,7 @@
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol.
   ansible.builtin.shell:
     cmd: |
+      #!/bin/bash
       client_package={{ output_client_package.stdout_lines[0] }}
       if [[ {{ offer_type }} == "base" ]]; then 
           repotypes=("beta" "base" "eus" "sap-ha" "base-sap-ha" "byol" "sap-apps" "base-sap-apps" "ha")
