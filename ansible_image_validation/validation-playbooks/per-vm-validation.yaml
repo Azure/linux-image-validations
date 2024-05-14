@@ -168,9 +168,9 @@
 
 ## Logic: Example client package for x86-64 based architecture: rhui-azure-rhel9-eus-2.3-655.noarch. This client package contains eus based offertype. 
 ## For BYOL offertype, this task is getting skippied.
-## According to the below logic, if the offertype value present inside the client package is different from the offertype value which is being supplied through the pipeline variables,It indicates that incorrect client package is present inside the RHEL Image according to the given offertype.
-## For base offertype, client package naming should not contain any offertype value. The below logic is iterating through the list of all the offertypes and checks if the value of any offertype is also present in the client package naming.
-## For the offers other than base and byol, the logic is iterating from the index 17 which means that it is skipping "rhui-azure-rhel9-"" portion of client package naming and only extracts the offertype whcih is present in the client package naming itself and storing it in a variable offer_within_clientpkg.
+## According to the below logic, if the offertype value present inside the client package naming is different from the offertype value which is being supplied through the pipeline variables, then incorrect client package is present inside the RHEL Image according to the given offertype.
+## For base offertype, client package naming should not contain any offertype value. The below logic is iterating through the list of all the existing offertypes and checks if the value of any offertype is also present in the client package naming.
+## For the offers other than base and byol, the logic is iterating from the index 17 which means that it is skipping "rhui-azure-rhel9-"" portion of client package naming and only extracts the offertype whcih is present in the client package naming itself and stores it in a variable offer_within_clientpkg.
 ## offer_within_clientpkg is equated against the {{ offer_type }} variable which is being supplied through the pipeline variables. If the correct client package is present, then the value of offer_within_clientpkg should be equal to the {{ offer_type }} variable.
 
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol and architecture is equal to x86-64.
@@ -227,6 +227,13 @@
     state: present 
   when: ( offer_type!='byol') and ( architecture == "x86-64" ) and ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol.stdout_lines)  
 
+## Logic: Example client package for arm64 based architecture: rhui-azure-rhel9-eus-arm64-2.3-655.noarch. This client package contains eus based offertype. 
+## For base offertype, the client package is rhui-azure-rhel9-arm64-2.3-655.noarch.
+## The difference between the naming of x86-64 based client pkgs and arm64 based client pkgs is that arm64 based client pkgs contain the name of architecture tyoe also. This has been taken into account in the below implemented logic.
+## For BYOL offertype, this task is getting skippied.
+## According to the below logic, the value of client package is iterated from index 17 and iteration runs until it gets a number and the substring is stored inside the variable offer_within_clientpkg. The substring will contain offertype value + "arm".
+## For base offertype, the value of substring should be equal to arm. For eus offertype, the value of substring should be eus-arm. The below implemented logic is equating these conditions and validates if the exisiting client pkg is according to the given offertype.
+## For arm64 based architecture type, we only published base and eus offertype images Therefore, other offertypes are not taken into an account in the below validation task. 
 
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol and architecture is equal to arm64.
   ansible.builtin.shell:
