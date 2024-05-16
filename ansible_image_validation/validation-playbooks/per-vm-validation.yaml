@@ -159,7 +159,7 @@
           if [[ "{{ architecture }}" -eq "arm64" ]]; then
               clientpkgwithoutarchitecture=""
               substring="arm64"
-              clientpkgwithoutarchitecture="${client_package//$substring/}"
+              clientpkgwithoutarchitecture = "${client_package//$substring/}"
               echo $clientpkgwithoutarchitecture
               client_package=clientpkgwithoutarchitecture
           fi
