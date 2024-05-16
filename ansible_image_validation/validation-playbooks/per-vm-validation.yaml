@@ -159,20 +159,18 @@
 - debug:
     var: output_client_package
 
-## Logic: Example client package for x86-64 based architecture: rhui-azure-rhel9-eus-2.3-655.noarch. This client package contains eus based offertype. 
-## For BYOL offertype, this task is getting skippied.
-## According to the below logic, if the offertype value present inside the client package naming is different from the offertype value which is being supplied through the pipeline variables, then incorrect client package is present inside the RHEL Image according to the given offertype.
-## For base offertype, client package naming should not contain any offertype value. The below logic is iterating through the list of all the existing offertypes and checks if the value of any offertype is also present in the client package naming.
-## For the offers other than base and byol, the logic is iterating from the index 17 which means that it is skipping "rhui-azure-rhel9-"" portion of client package naming and only extracts the offertype whcih is present in the client package naming itself and stores it in a variable offer_within_clientpkg.
-## offer_within_clientpkg is equated against the {{ offer_type }} variable which is being supplied through the pipeline variables. If the correct client package is present, then the value of offer_within_clientpkg should be equal to the {{ offer_type }} variable.
-
 
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol and architecture is equal to x86-64.
   ansible.builtin.shell:
     cmd: |
       #!/bin/bash
-          if [[ "{{ architecture }}" -ne "arm64" ]]; then
-              client_package={{ output_client_package.stdout_lines[0] }}   ##debug
+           client_package={{ output_client_package.stdout_lines[0] }} 
+          if [[ "{{ architecture }}" -eq "arm64" ]]; then
+              clientpkgwithoutarchitecture=""
+              substring="arm64"
+              clientpkgwithoutarchitecture="${client_package//$substring/}"
+              client_package=clientpkgwithoutarchitecture
+          fi
               offer_in_rhel_image=""
               substring="rhui-azure-rhel9-"
               string_without_substring="${client_package//$substring/}"
@@ -187,10 +185,7 @@
                     echo "Correct Client Package according to the given offertype"
               else
                     echo "Incorrect Client Package according to the given offertype"
-              fi    
-           else 
-               echo "debugging"
-           fi     
+              fi       
   register: output_offertype_except_byol
   when: offer_type !='byol' 
 
