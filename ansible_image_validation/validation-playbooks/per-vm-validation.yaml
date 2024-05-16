@@ -146,7 +146,7 @@
 - name: Check if offertype is equal to byol and client package is present
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n  Client Package {{ rhui_package }} is present in BYOL Offertype Image"
+    line: "\n  Client Package is present in BYOL Offertype Image. Details of the client package {{ rhui_package }}"
     create: yes
     state: present 
   when: offer_type =='byol' and rhui_package_count != "0"
@@ -162,6 +162,7 @@
               substring="arm64"
               clientpkgwithoutarchitecture="${client_package//$substring/}"
               client_package=clientpkgwithoutarchitecture
+              echo $client_package
           fi
               offer_in_rhel_image=""
               substring="rhui-azure-rhel9-"
