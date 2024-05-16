@@ -157,7 +157,7 @@
       #!/bin/bash
           client_package=$( rpm -qa | grep rhui ) 
           if [[ "{{ architecture }}" -eq "arm64" ]]; then
-              substring="arm64"
+              substring="arm64-"
               clientpkgwithoutarchitecture="${client_package//$substring/}"
               echo $clientpkgwithoutarchitecture
               client_package=$clientpkgwithoutarchitecture
