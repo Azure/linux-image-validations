@@ -156,6 +156,7 @@
     cmd: |
       #!/bin/bash
           client_package=$(rpm-qa | grep rhui) 
+          echo $client_package
           if [[ "{{ architecture }}" -eq "arm64" ]]; then
               echo "statement 1"
               clientpkgwithoutarchitecture=""
