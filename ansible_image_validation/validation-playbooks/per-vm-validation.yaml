@@ -161,7 +161,8 @@
               clientpkgwithoutarchitecture="${client_package//$substring/}"            ## The arm64 substing is removed so that common validation logic can be used for the client packages of both the types of architectures.
               echo $clientpkgwithoutarchitecture
               client_package=$clientpkgwithoutarchitecture                            
-          fi                                                                            
+          fi                            
+                                                          
               substring="${client_package:0:17}"                                       ## The substring "rhui-azure-rhel9-" will be eliminated from the variable which contains the value of client package.
               client_pkg_without_substring="${client_package//$substring/}"            ## After removing the above substring, the remaining string will be equal to "offer"+"build numer"+ noarch value. Example string: eus-2.3-655.noarch. For base client packages, it should be only 2.3-655.noarch. This value is getting stored in string_without_substring variable.
               echo $client_pkg_without_substring
@@ -171,19 +172,18 @@
               offertype={{ offer_type }}
               offertype=${offertype//-/}                                               ## In this command, all the hyphens are being removed from the {{ offer_type }} variable which is being supplied through the pipeline and the output is stored in the offertype variable.
 
+
               echo "Print the value of the offertype passed in the pipeline variables: " $offertype
               echo "Print the value of the offertype which is present the client package name: " $offer_in_rhel_image
-              offer_within_clientpkg=${offer_within_clientpkg//-/}
+  
 
               if [[  $offertype  == "base" ]]; then
                   if [[ -z "$offer_in_rhel_image" ]]; then 
-                        echo "block 1"
                         echo "Correct Client Package according to the given offertype"
                   else
                         echo "Incorrect Client Package according to the given offertype"        ## This if block refers to the check for the base offertype which is supplied through pipeline variables. The value of offer_in_rhel_image variable should be null. Example of base offertype client package "rhui-azure-rhel9-2.3-655.noarch". It does not contain the value of any offertype of RHEL Images.
                   fi   
               else    
-                  echo "block 2"
                   if [[ $offertype == $offer_in_rhel_image ]]; then 
                         echo "Correct Client Package according to the given offertype"
                   else
@@ -200,7 +200,7 @@
 - name: "Write to error msg if incorrect client package is present according to the offertype"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n Incorrect Client Package {{  output_client_package.stdout_lines[0] }} is present according to the offertype {{ offer_type }}."
+    line: "\n Incorrect Client Package is present according to the offertype {{ offer_type }}."
     create: yes
     state: present 
   when: ( offer_type!='byol') and ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol.stdout_lines)  
