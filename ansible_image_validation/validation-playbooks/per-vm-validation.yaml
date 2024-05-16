@@ -184,7 +184,7 @@
                   fi   
               else    
                   echo "block 2"
-                  if [[ $offer_type == $offer_in_rhel_image ]]; then 
+                  if [[ $offertype == $offer_in_rhel_image ]]; then 
                         echo "Correct Client Package according to the given offertype"
                   else
                         echo "Incorrect Client Package according to the given offertype"        ## This else block refers to the check for the remaining offertypes which is supplied through pipeline variables. The value of offer_in_rhel_image variable should not be null.
