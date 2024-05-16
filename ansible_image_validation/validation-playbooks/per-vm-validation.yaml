@@ -175,10 +175,13 @@
               offer_in_rhel_image=""
               substring="rhui-azure-rhel9-"
               string_without_substring="${client_package//$substring/}"
+              echo $string_without_substring
               offerval="${string_without_substring%%[0-9]*}"          
               offer_in_rhel_image=${offerval//-/}
               offertype={{ offer_type }}
               offertype=${offertype//-/}
+              echo $offertype
+              echo $offer_in_rhel
               echo "Print the value of the offertype passed in the pipeline variables: " {{ offer_type }} 
               echo "Print the value of the offertype which is present the client package name: " $offer_in_rhel_imag
               offer_within_clientpkg=${offer_within_clientpkg//-/}
