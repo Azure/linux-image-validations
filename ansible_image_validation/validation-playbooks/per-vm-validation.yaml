@@ -146,25 +146,16 @@
 - name: Check if offertype is equal to byol and client package is present
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n  Client Package is present in byol Offertype Image"
+    line: "\n  Client Package {{ rhui_package }} is present in BYOL Offertype Image"
     create: yes
     state: present 
   when: offer_type =='byol' and rhui_package_count != "0"
-
-- name: Check the value of client package
-  shell: rpm -qa | grep rhui
-  register: output_client_package
-  when: offer_type!='byol'
-
-- debug:
-    var: output_client_package
-
 
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol.
   ansible.builtin.shell:
     cmd: |
       #!/bin/bash
-          client_package={{ output_client_package.stdout_lines[0] }} 
+          client_package=$(rpm-qa | grep rhui) 
           if [[ "{{ architecture }}" -eq "arm64" ]]; then
               echo "statement 1"
               clientpkgwithoutarchitecture=""
