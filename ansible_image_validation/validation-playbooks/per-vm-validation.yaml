@@ -160,7 +160,7 @@
     var: output_client_package
 
 
-- name: Check if the client package is present according to the offertype when offertype is not equal to byol and architecture is equal to x86-64.
+- name: Check if the client package is present according to the offertype when offertype is not equal to byol.
   ansible.builtin.shell:
     cmd: |
       #!/bin/bash
@@ -186,18 +186,27 @@
               echo "Print the value of the offertype passed in the pipeline variables: " {{ offer_type }} 
               echo "Print the value of the offertype which is present the client package name: " $offer_in_rhel_imag
               offer_within_clientpkg=${offer_within_clientpkg//-/}
-              if [[ {{ offer_type }}  == $offer_in_rhel_imag ]]; then 
-                    echo "Correct Client Package according to the given offertype"
-              else
-                    echo "Incorrect Client Package according to the given offertype"
-              fi       
+              if [[ {{ offer_type }} == "base" ]]; then
+                  if [[ -z "$offer_in_rhel_imag" ]]; then 
+                        echo "Correct Client Package according to the given offertype"
+                  else
+                        echo "Incorrect Client Package according to the given offertype"
+                  fi   
+              else    
+                  if [[ {{ offer_type }}  == $offer_in_rhel_imag ]]; then 
+                        echo "Correct Client Package according to the given offertype"
+                  else
+                        echo "Incorrect Client Package according to the given offertype"
+                  fi   
+              fi
+
   register: output_offertype_except_byol
   when: offer_type !='byol' 
 
 - debug:
     var: output_offertype_except_byol 
 
-- name: "Write to error msg if incorrect client package is present according to the offertype and architecture is equal to x86-64"
+- name: "Write to error msg if incorrect client package is present according to the offertype"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
     line: "\n Incorrect Client Package {{  output_client_package.stdout_lines[0] }} is present according to the offertype {{ offer_type }}."
