@@ -171,7 +171,7 @@
   ansible.builtin.shell:
     cmd: |
       #!/bin/bash
-          if ( "{{ architecture }}" != "arm64"); then
+          if ( "{{ architecture }}" -ne "arm64"); then
               client_package={{ output_client_package.stdout_lines[0] }}   ##debug
               offer_in_rhel_image=""
               substring="rhui-azure-rhel9-"
@@ -188,7 +188,6 @@
               else
                     echo "Incorrect Client Package according to the given offertype"
               fi    
-
            else 
                echo "debugging"
            fi     
