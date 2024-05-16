@@ -166,6 +166,7 @@
       #!/bin/bash
            client_package={{ output_client_package.stdout_lines[0] }} 
           if [[ "{{ architecture }}" -eq "arm64" ]]; then
+              echo "statement 1"
               clientpkgwithoutarchitecture=""
               substring="arm64"
               clientpkgwithoutarchitecture="${client_package//$substring/}"
