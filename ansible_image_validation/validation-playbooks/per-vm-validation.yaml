@@ -165,7 +165,8 @@
                       
               package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')
               extract_offer_val=$(echo $package_type | sed -E 's/^[^-]+-[^-]+-[^-]+-//')
-
+              
+              offertype={{ offer_type }}
               offertype=${offertype//-/}  
               extract_offer_val=${extract_offer_val//-/}
 
