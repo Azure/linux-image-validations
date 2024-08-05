@@ -143,6 +143,14 @@
 
 ##Repo Validation Task
 
+- name: Check if more than 1 client package is present in the RHEL Image
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n  The RHEL Image contains more than 1 client package"
+    create: yes
+    state: present 
+  when: rhui_package_count > "1"
+
 - name: Check if offertype is equal to byol and client package is present
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
@@ -150,7 +158,6 @@
     create: yes
     state: present 
   when: offer_type =='byol' and rhui_package_count != "0"
-
 
 - name: Check if the client package is present according to correct architecture
   ansible.builtin.shell:
