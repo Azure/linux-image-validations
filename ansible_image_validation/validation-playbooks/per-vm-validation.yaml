@@ -151,6 +151,30 @@
     state: present 
   when: offer_type =='byol' and rhui_package_count != "0"
 
+
+- name: Check if the client package is present according to correct architecture
+  ansible.builtin.shell:
+    cmd: |
+      #!/bin/bash
+          if [[ "{{ architecture }}" -eq "arm64" ]]; then                                          ## if the architecture is arm64 based then client package value will contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-arm64-2.3-655.noarch","rhui-azure-rhel9-arm64-2.3-655.noarch"
+                check_correctness=$( rpm -qa | grep arm64 ) 
+                if [[ -z "$check_correctness" ]]; then 
+                      echo "Incorrect Client Package according to the given offertype"
+                else
+                      echo "Client Package according to the given offertype"                
+                fi 
+          else
+                check_correctness=$( rpm -qa | grep arm64 ) 
+                if [[ -z "$check_correctness" ]]; then 
+                      echo "Correct Client Package according to the given offertype"
+                else
+                      echo "Incorrect Client Package according to the given offertype"               ## This if block refers to the check for the client packages of x86-64 architecture type. The client packages of x86-64 architecture type don't contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-2.3-655.noarch","rhui-azure-rhel9-2.3-655.noarch"
+                fi 
+          fi                            
+  register: output_offertype_except_byol
+  when: offer_type !='byol'                       
+
+
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol.
   ansible.builtin.shell:
     cmd: |
@@ -163,9 +187,9 @@
           fi                            
                                                           
                       
-              package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')
-              extract_offer_val=$(echo $package_type | sed -E 's/^[^-]+-[^-]+-[^-]+-//')
-              
+              package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')                            ## Extract suffix -2.3-5343.noarch.rpm from client package
+              extract_offer_val=$(echo $package_type | sed -E 's/^[^-]+-[^-]+-[^-]+-//')                                    ## Extract prefix rhui-azure-rhel8- val from client package
+
               offertype={{ offer_type }}
               offertype=${offertype//-/}  
               extract_offer_val=${extract_offer_val//-/}
