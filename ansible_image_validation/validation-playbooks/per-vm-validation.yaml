@@ -197,7 +197,9 @@
                                                           
                       
               package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')                            ## Extract suffix  "-2.3-5343.noarch.rpm"  from client package
-              extract_offer_val=$(echo $package_type | sed -E 's/^[^-]+-[^-]+-[^-]+-//')                                    ## Extract prefix  "rhui-azure-rhel8-""  val from client package
+              prefix=$(echo $client_package | sed -E 's/^([^-]+-[^-]+-[^-]+)-.*/\1/')                                       ## Extract prefix  "rhui-azure-rhel8-""  val from client package
+              extract_offer_val=$(echo $package_type | sed "s/$prefix//")                                                   ## For Base Offertype, extract_offer_val should be equal to null.
+
 
               offertype={{ offer_type }}
               offertype=${offertype//-/}  
