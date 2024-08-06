@@ -189,15 +189,15 @@
     cmd: |
       #!/bin/bash
           client_package=$( rpm -qa | grep rhui )                                      ## Value of client package is getting calculated
-          if [[ "{{ architecture }}" -eq "arm64" ]]; then                              ## if the architecture is arm64 based then client package value will contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-arm64-2.3-655.noarch","rhui-azure-rhel9-arm64-2.3-655.noarch"
-              substring="arm64-"                                                       ## The value of client packages for architecture type x86-64 don't contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-2.3-655.noarch","rhui-azure-rhel9-2.3-655.noarch"
+          if [[ "{{ architecture }}" -eq "arm64" ]]; then                              
+              substring="arm64-"                                                       
               clientpkgwithoutarchitecture="${client_package//$substring/}"            ## The arm64 substing is removed so that common validation logic can be used for the client packages of both the types of architectures.
               client_package=$clientpkgwithoutarchitecture                            
           fi                            
                                                           
                       
-              package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')                            ## Extract suffix -2.3-5343.noarch.rpm from client package
-              extract_offer_val=$(echo $package_type | sed -E 's/^[^-]+-[^-]+-[^-]+-//')                                    ## Extract prefix rhui-azure-rhel8- val from client package
+              package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')                            ## Extract suffix  "-2.3-5343.noarch.rpm"  from client package
+              extract_offer_val=$(echo $package_type | sed -E 's/^[^-]+-[^-]+-[^-]+-//')                                    ## Extract prefix  "rhui-azure-rhel8-""  val from client package
 
               offertype={{ offer_type }}
               offertype=${offertype//-/}  
