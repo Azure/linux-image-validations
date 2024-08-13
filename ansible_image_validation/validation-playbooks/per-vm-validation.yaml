@@ -166,16 +166,16 @@
           if [[ "{{ architecture }}" -eq "arm64" ]]; then                                            ## This if block refers to the check for the client packages of arm64 architecture type.  The client packages of arm64 architecture is arm64  will contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-arm64-2.3-655.noarch","rhui-azure-rhel9-arm64-2.3-655.noarch"
                 check_correctness=$( rpm -qa | grep arm64 ) 
                 if [[ -z "$check_correctness" ]]; then 
-                      echo "Incorrect Client Package according to the given architecture type."
+                      echo "Client Package does not contain the value of arm64 architecture type."
                 else
-                      echo "Client Package according to the given architecture type."                
+                      echo "Client Package contains the value of arm64 architecture type."                
                 fi 
           else
                 check_correctness=$( rpm -qa | grep arm64 ) 
                 if [[ -z "$check_correctness" ]]; then 
-                      echo "Correct Client Package according to the given architecture type."
+                      echo "Correct Client Package is correct. It does not contain the value of arm64 architecture type"
                 else
-                      echo "Incorrect Client Package according to the given architecture type."               ## This if block refers to the check for the client packages of x86-64 architecture type. The client packages of x86-64 architecture type don't contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-2.3-655.noarch","rhui-azure-rhel9-2.3-655.noarch"
+                      echo "Client Package according to the given architecture type. It contains the value of arm64 architecture type"               ## This if block refers to the check for the client packages of x86-64 architecture type. The client packages of x86-64 architecture type don't contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-2.3-655.noarch","rhui-azure-rhel9-2.3-655.noarch"
                 fi 
           fi                            
   register: output_offertype_except_byol
@@ -196,8 +196,8 @@
           fi                            
                                                           
                       
-              package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')                            ## Extract suffix  "-2.3-5343.noarch.rpm"  from client package
-              prefix=$(echo $client_package | sed -E 's/^([^-]+-[^-]+-[^-]+)-.*/\1/')                                       ## Extract prefix  "rhui-azure-rhel8-""  val from client package
+              package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')                            ## Eliminate the suffix  "-2.3-5343.noarch.rpm"  from client package. Remaining value should be equal to "rhui-azure-rhel8" + "offertype" | Examples: "rhui-azure-rhel8", "rhui-azure-rhel8-eus", "rhui-azure-rhel8-sap-ha"
+              prefix=$(echo $client_package | sed -E 's/^([^-]+-[^-]+-[^-]+)-.*/\1/')                                       ## Extract prefix rhui-azure-rhel8"  value from client package
               extract_offer_val=$(echo $package_type | sed "s/$prefix//")                                                   ## For Base Offertype, extract_offer_val should be equal to null.
 
 
