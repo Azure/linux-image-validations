@@ -12,7 +12,7 @@
     line: "\n  The RHEL Image contains more than 1 client package"
     create: yes
     state: present 
-  when: rhui_package_count > "1"
+  when: ( rhui_package_count | int ) > 1
 
 - name: Check if offertype is equal to byol and client package is present
   lineinfile:
