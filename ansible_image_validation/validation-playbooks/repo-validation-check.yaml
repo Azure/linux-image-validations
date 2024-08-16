@@ -1,5 +1,12 @@
 ##This playbook checks if the RHEL Images contain client packages according to the offer type and architecture of the Image.
 
+- hosts: all
+  tasks:
+    - name: Print the value of a variable
+      debug:
+        msg: "The value of the variable is {{ offer_type }} , {{ architecture }} , {{ rhui_package_count }} , {{ rhui_package }} "
+
+
 - name: Check if more than 1 client package is present in the RHEL Image
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
