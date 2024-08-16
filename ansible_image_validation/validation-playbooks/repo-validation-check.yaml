@@ -3,7 +3,7 @@
 
 - name: Print the value of a variable
   debug:
-      msg: "The value of the variable is {{ offer_type }} , {{ architecture }} , {{ rhui_package_count }} , {{ rhui_package }} "
+      msg: "The value of the variable is Offetype: {{ offer_type }} , Architecture_type: {{ architecture }} , RhuiPackageCount: {{ rhui_package_count }} , RhuiPackageDetails: {{ rhui_package }} "
 
 
 - name: Check if more than 1 client package is present in the RHEL Image
