@@ -140,7 +140,7 @@
       is_rhui_package_present : true
     when: rhui_package_count != "0"
 
-- name: Check the repo-validation
+- name: Check the repo-validation of RHEL Image according to the offertype and client package present in it.
   include_tasks: validation-playbooks/repo-validation-check.yaml
   ignore_errors: yes
 
