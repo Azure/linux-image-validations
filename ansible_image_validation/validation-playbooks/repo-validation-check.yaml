@@ -1,13 +1,20 @@
 ##This playbook checks if the RHEL Images contain client packages according to the offer type and architecture of the Image.
 
+- name: Set the variable if rhui client package is correct according to the given architecturetype
+  set_fact:
+    CorrectPackageAccToArch : "Correct Client Package according to the given architecture {{ architecture }}."
+
+- name: Set the variable if rhui client package is incorrect according to the given architecturetype
+  set_fact:
+    IncorrectPackageAccToArch : "Incorrect Client Package according to the given architecture {{ architecture }}."
 
 - name: Set the variable if rhui client package is correct according to the given offertype
   set_fact:
-    PrintResultofCorrectPackage : "Correct Client Package according to the given offertype {{ offer_type }}"
+    CorrectPackageAccToOffer : "Correct Client Package according to the given offertype {{ offer_type }}."
 
 - name: Set the variable if rhui client package is incorrect according to the given offertype
   set_fact:
-    PrintResultofIncorrectPackage : "Incorrect Client Package according to the given offertype {{ offer_type }}"
+    IncorrectPackageAccToOffer : "Incorrect Client Package according to the given offertype {{ offer_type }}."
 
 - name: Print the value of a variable
   debug:
@@ -34,35 +41,46 @@
   ansible.builtin.shell:
     cmd: |
       #!/bin/bash
-          if [[ "{{ architecture }}" -eq "arm64" ]]; then                                            ## This if block refers to the check for the client packages of arm64 architecture type.  The client packages of arm64 architecture is arm64  will contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-arm64-2.3-655.noarch","rhui-azure-rhel9-arm64-2.3-655.noarch"
+          if [[ "{{ architecture }}" -eq "arm64" ]]; then                                                                  ## This if block refers to the check for the client packages of arm64 architecture type.  The client packages of arm64 architecture is arm64  will contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-arm64-2.3-655.noarch","rhui-azure-rhel9-arm64-2.3-655.noarch"
                 check_correctness=$( rpm -qa | grep arm64 ) 
                 if [[ -z "$check_correctness" ]]; then 
-                      echo "Client Package is incorrect according to the given architecturetype {{ architecture }}. It does not contain the substring arm64 in the client package. "
+                      echo "{{ CorrectPackageAccToArch }}"
                 else
-                      echo "Correct Client Package is correct according to the given architecturetype {{ architecture }}. It contains the substring arm64 in the client package. "                
+                      echo "{{ IncorrectPackageAccToArch }} "                
                 fi 
           else
                 check_correctness=$( rpm -qa | grep arm64 ) 
                 if [[ -z "$check_correctness" ]]; then 
-                      echo "Correct Client Package is correct according to the given architecturetype {{ architecture }}. It does not contain the substring arm64 in the client package. "
+                      echo "{{ CorrectPackageAccToArch }}"
                 else
-                      echo "Client Package is incorrect according to the given architecturetype {{ architecture }}. It contains the substring arm64 in the client package. "               ## This if block refers to the check for the client packages of x86-64 architecture type. The client packages of x86-64 architecture type don't contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-2.3-655.noarch","rhui-azure-rhel9-2.3-655.noarch"
+                      echo " {{ IncorrectPackageAccToArch }}"                                                               ## This if block refers to the check for the client packages of x86-64 architecture type. The client packages of x86-64 architecture type don't contain arm64 or x86-64 as a substring. Example client package: "rhui-azure-rhel9-eus-2.3-655.noarch","rhui-azure-rhel9-2.3-655.noarch"
                 fi 
           fi                            
-  register: output_offertype_except_byol
+  register: output_package_acc_architecture
   when: offer_type !='byol'                       
 
 - debug:
-    var: output_offertype_except_byol 
+    var: output_package_acc_architecture
+
+
+- name: "Write to error msg if incorrect client package is present according to the architecture"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n {{ IncorrectPackageAccToArch }}"
+    create: yes
+    state: present 
+  when: ( offer_type!='byol') and ("{{ IncorrectPackageAccToArch }}" in output_package_acc_architecture.stdout_lines)  
+
+
 
 - name: Check if the client package is present according to the offertype when offertype is not equal to byol.
   ansible.builtin.shell:
     cmd: |
       #!/bin/bash
-          client_package=$( rpm -qa | grep rhui )                                      ## Value of client package is getting calculated
+          client_package=$( rpm -qa | grep rhui )                                                                           ## Value of client package is getting calculated
           if [[ "{{ architecture }}" -eq "arm64" ]]; then                              
               substring="arm64-"                                                       
-              clientpkgwithoutarchitecture="${client_package//$substring/}"            ## The arm64 substing is removed so that common validation logic can be used for the client packages of both the types of architectures.
+              clientpkgwithoutarchitecture="${client_package//$substring/}"                                                 ## The arm64 substing is removed so that common validation logic can be used for the client packages of both the types of architectures.
               client_package=$clientpkgwithoutarchitecture                            
           fi                            
                                                           
@@ -81,16 +99,16 @@
   
               if [[  $offertype  == "base" ]]; then
                   if [[ -z "$extract_offer_val" ]]; then 
-                        echo "{{ PrintResultofCorrectPackage }}"
+                        echo "{{ CorrectPackageAccToOffer }}"
                   else
-                        echo "{{ PrintResultofIncorrectPackage }}"        ## This if block refers to the check for the base offertype which is supplied through pipeline variables. The value of extract_offer_val variable should be null. Example of base offertype client package "rhui-azure-rhel9-2.3-655.noarch". It does not contain the value of any offertype of RHEL Images.
+                        echo "{{ IncorrectPackageAccToOffer }}"                                                             ## This if block refers to the check for the base offertype which is supplied through pipeline variables. The value of extract_offer_val variable should be null. Example of Base Offertype client package "rhui-azure-rhel9-2.3-655.noarch". It does not contain the value of any offertype of RHEL Images.
                   fi   
 
               else    
                   if [[ $offertype == $extract_offer_val ]]; then 
-                        echo "{{ PrintResultofCorrectPackage }}"
+                        echo "{{ CorrectPackageAccToOffer }}"
                   else
-                        echo "{{ PrintResultofIncorrectPackage }}"        ## This else block refers to the check for the remaining offertypes which is supplied through pipeline variables. The value of extract_offer_val variable should not be null.
+                        echo "{{ IncorrectPackageAccToOffer }}"                                                             ## This else block refers to the check for the remaining offertypes which is supplied through pipeline variables. The value of extract_offer_val variable should not be null. Example of client package other than Base Offertype: "rhui-azure-rhel9-eus-2.3-655.noarch" .
                   fi   
               fi
 
@@ -103,8 +121,8 @@
 - name: "Write to error msg if incorrect client package is present according to the offertype"
   lineinfile:
     path: "{{err_folder}}/err_msgs.log"
-    line: "\n Incorrect Client Package is present according to the offertype {{ offer_type }}."
+    line: "\n {{ IncorrectPackageAccToOffer }}"
     create: yes
     state: present 
-  when: ( offer_type!='byol') and ("Incorrect Client Package according to the given offertype" in output_offertype_except_byol.stdout_lines)  
+  when: ( offer_type!='byol') and ("{{ IncorrectPackageAccToOffer }}" in output_offertype_except_byol.stdout_lines)  
 
