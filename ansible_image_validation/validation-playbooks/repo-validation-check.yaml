@@ -44,9 +44,9 @@
           if [[ "{{ architecture }}" -eq "arm64" ]]; then                                                                  ## This if block refers to the check for the client packages of arm64 architecture type.  The client packages of arm64 architecture is arm64  will contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-arm64-2.3-655.noarch","rhui-azure-rhel9-arm64-2.3-655.noarch"
                 check_correctness=$( rpm -qa | grep arm64 ) 
                 if [[ -z "$check_correctness" ]]; then 
-                      echo "{{ CorrectPackageAccToArch }}"
+                      echo "{{ IncorrectPackageAccToArch }}"
                 else
-                      echo "{{ IncorrectPackageAccToArch }} "                
+                      echo "{{ CorrectPackageAccToArch }} "                
                 fi 
           else
                 check_correctness=$( rpm -qa | grep arm64 ) 
