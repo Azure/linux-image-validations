@@ -83,7 +83,7 @@
                   if [[ -z "$extract_offer_val" ]]; then 
                         echo "{{ PrintResultofCorrectPackage }}"
                   else
-                        echo "{{ PrintResultofInorrectPackage }}"        ## This if block refers to the check for the base offertype which is supplied through pipeline variables. The value of extract_offer_val variable should be null. Example of base offertype client package "rhui-azure-rhel9-2.3-655.noarch". It does not contain the value of any offertype of RHEL Images.
+                        echo "{{ PrintResultofIncorrectPackage }}"        ## This if block refers to the check for the base offertype which is supplied through pipeline variables. The value of extract_offer_val variable should be null. Example of base offertype client package "rhui-azure-rhel9-2.3-655.noarch". It does not contain the value of any offertype of RHEL Images.
                   fi   
 
               else    
