@@ -3,11 +3,11 @@
 
 - name: Set the variable if rhui client package is correct according to the given offertype
   set_fact:
-    PrintResultofCorrectPackage : "Correct Client Package according to the given offertype"
+    PrintResultofCorrectPackage : "Correct Client Package according to the given offertype {{ offer_type }}"
 
 - name: Set the variable if rhui client package is incorrect according to the given offertype
   set_fact:
-    PrintResultofIncorrectPackage : "Incorrect Client Package according to the given offertype"
+    PrintResultofIncorrectPackage : "Incorrect Client Package according to the given offertype {{ offer_type }}"
 
 - name: Print the value of a variable
   debug:
@@ -81,16 +81,16 @@
   
               if [[  $offertype  == "base" ]]; then
                   if [[ -z "$extract_offer_val" ]]; then 
-                        echo " PrintResultofCorrectPackage"
+                        echo "{{ PrintResultofCorrectPackage }}"
                   else
-                        echo " PrintResultofInorrectPackage"        ## This if block refers to the check for the base offertype which is supplied through pipeline variables. The value of extract_offer_val variable should be null. Example of base offertype client package "rhui-azure-rhel9-2.3-655.noarch". It does not contain the value of any offertype of RHEL Images.
+                        echo "{{ PrintResultofInorrectPackage }}"        ## This if block refers to the check for the base offertype which is supplied through pipeline variables. The value of extract_offer_val variable should be null. Example of base offertype client package "rhui-azure-rhel9-2.3-655.noarch". It does not contain the value of any offertype of RHEL Images.
                   fi   
 
               else    
                   if [[ $offertype == $extract_offer_val ]]; then 
-                        echo " PrintResultofCorrectPackage"
+                        echo "{{ PrintResultofCorrectPackage }}"
                   else
-                        echo " PrintResultofIncorrectPackage"        ## This else block refers to the check for the remaining offertypes which is supplied through pipeline variables. The value of extract_offer_val variable should not be null.
+                        echo "{{ PrintResultofIncorrectPackage }}"        ## This else block refers to the check for the remaining offertypes which is supplied through pipeline variables. The value of extract_offer_val variable should not be null.
                   fi   
               fi
 
