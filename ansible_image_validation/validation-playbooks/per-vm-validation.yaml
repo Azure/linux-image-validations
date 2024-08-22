@@ -107,7 +107,6 @@
     when: ("pci" not in check_pci_allimages.stdout)
 
 - name: Check for Rhui client package in the image
-  when: license_type != 'byos'
   block:
   - name: Gather the package facts
     ansible.builtin.package_facts:
@@ -134,12 +133,16 @@
       line: "Rhui Client package is not installed in the image"
       create: yes
       state: present
-    when: rhui_package_count == "0"
+    when: rhui_package_count == "0" and offer_type !='byol'
 
   - name: Set the variable if rhui client package is found
     set_fact:
       is_rhui_package_present : true
     when: rhui_package_count != "0"
+
+- name: Check the repo-validation of RHEL Image according to the offertype and client package present in it.
+  include_tasks: validation-playbooks/repo-validation-check.yaml
+  ignore_errors: yes
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
   when: isCVM is false and ansible_distribution_major_version == '9'

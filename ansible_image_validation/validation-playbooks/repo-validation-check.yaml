@@ -1,0 +1,128 @@
+##This playbook checks if the RHEL Images contain client packages according to the offer type and architecture of the Image.
+
+- name: Set the variable if rhui client package is correct according to the given architecturetype
+  set_fact:
+    Correct_Package_Acc_To_Arch : "Correct Client Package according to the given architecture {{ architecture }}."
+
+- name: Set the variable if rhui client package is incorrect according to the given architecturetype
+  set_fact:
+    Incorrect_Package_Acc_To_Arch : "Incorrect Client Package according to the given architecture {{ architecture }}."
+
+- name: Set the variable if rhui client package is correct according to the given offertype
+  set_fact:
+    Correct_Package_Acc_To_Offer : "Correct Client Package according to the given offertype {{ offer_type }}."
+
+- name: Set the variable if rhui client package is incorrect according to the given offertype
+  set_fact:
+    Incorrect_Package_Acc_To_Offer : "Incorrect Client Package according to the given offertype {{ offer_type }}."
+
+- name: Print the value of a variable
+  debug:
+      msg: "The value of the variable is Offetype: {{ offer_type }} , Architecture_type: {{ architecture }} , RhuiPackageCount: {{ rhui_package_count }} , RhuiPackageDetails:{{ rhui_package }} "
+
+
+- name: Check if more than 1 client package is present in the RHEL Image
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n  The RHEL Image contains more than 1 client package"
+    create: yes
+    state: present 
+  when: ( rhui_package_count | int ) > 1
+
+- name: Check if offertype is equal to byol and client package is present
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n  Client Package is present in BYOL Offertype Image. Details of the client package {{ rhui_package }}"
+    create: yes
+    state: present 
+  when: offer_type =='byol' and rhui_package_count != "0"
+
+- name: Check if the correct client package is present according to the architecture type
+  ansible.builtin.shell:
+    cmd: |
+      #!/bin/bash
+          if [[ "{{ architecture }}" -eq "arm64" ]]; then                                                                  ## This if block refers to the check for the client packages of arm64 architecture type.  The client packages of arm64 architecture is arm64  will contain arm64 as a substring.Example client package: "rhui-azure-rhel9-eus-arm64-2.3-655.noarch","rhui-azure-rhel9-arm64-2.3-655.noarch"
+                check_correctness=$( rpm -qa | grep arm64 ) 
+                if [[ -z "$check_correctness" ]]; then 
+                      echo "{{ Incorrect_Package_Acc_To_Arch }}"
+                else
+                      echo "{{ Correct_Package_Acc_To_Arch }} "                
+                fi 
+          else
+                check_correctness=$( rpm -qa | grep arm64 ) 
+                if [[ -z "$check_correctness" ]]; then 
+                      echo "{{ Correct_Package_Acc_To_Arch }}"
+                else
+                      echo " {{ Incorrect_Package_Acc_To_Arch }}"                                                               ## This if block refers to the check for the client packages of x86-64 architecture type. The client packages of x86-64 architecture type don't contain arm64 or x86-64 as a substring. Example client package: "rhui-azure-rhel9-eus-2.3-655.noarch","rhui-azure-rhel9-2.3-655.noarch"
+                fi 
+          fi                            
+  register: output_package_acc_architecture
+  when: offer_type !='byol'                       
+
+- debug:
+    var: output_package_acc_architecture
+
+
+- name: "Write to error msg if incorrect client package is present according to the architecture"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n {{ Incorrect_Package_Acc_To_Arch }}"
+    create: yes
+    state: present 
+  when: ( offer_type!='byol') and ("{{ Incorrect_Package_Acc_To_Arch }}" in output_package_acc_architecture.stdout_lines)  
+
+
+
+- name: Check if the client package is present according to the offertype when offertype is not equal to byol.
+  ansible.builtin.shell:
+    cmd: |
+      #!/bin/bash
+          client_package=$( rpm -qa | grep rhui )                                                                           ## Value of client package is getting calculated
+          if [[ "{{ architecture }}" -eq "arm64" ]]; then                              
+              substring="arm64-"                                                       
+              client_pkg_without_architecture="${client_package//$substring/}"                                                 ## The arm64 substing is removed so that common validation logic can be used for the client packages of both the types of architectures.
+              client_package=$client_pkg_without_architecture                            
+          fi                            
+                                                          
+                      
+              package_type=$(echo $client_package | sed 's/-[0-9]\+\.[0-9]\+-[0-9]\+\.noarch//')                               ## Eliminate the suffix  "-2.3-5343.noarch.rpm"  from client package. Remaining value should be equal to "rhui-azure-rhel8" + "offertype" | Examples: "rhui-azure-rhel8", "rhui-azure-rhel8-eus", "rhui-azure-rhel8-sap-ha"
+              prefix=$(echo $client_package | sed -E 's/^([^-]+-[^-]+-[^-]+)-.*/\1/')                                          ## Extract prefix rhui-azure-rhel8"  value from client package
+              extract_offer_val=$(echo $package_type | sed "s/$prefix//")                                                      ## For Base Offertype, extract_offer_val should be equal to null.
+
+
+              offertype={{ offer_type }}                                                                                       ## The value of offertype is passed through pipeline variables. Example: "base", "eus", "sap-ha"
+              offertype=${offertype//-/}  
+              extract_offer_val=${extract_offer_val//-/}                                                                       ## The "-" is removed from the offertype and extract_offer_val variable so that the comparison can be done without any special characters.
+
+              echo "Print the value of the offertype passed in the pipeline variables: " $offertype
+              echo "Print the value of the offertype which is present the client package name: " $extract_offer_val
+  
+              if [[  $offertype  == "base" ]]; then
+                  if [[ -z "$extract_offer_val" ]]; then 
+                        echo "{{ Correct_Package_Acc_To_Offer }}"
+                  else
+                        echo "{{ Incorrect_Package_Acc_To_Offer }}"                                                             ## This if block refers to the check for the base offertype which is supplied through pipeline variables. The value of extract_offer_val variable should be null. Example of Base Offertype client package "rhui-azure-rhel9-2.3-655.noarch". It does not contain the value of any offertype of RHEL Images.
+                  fi   
+
+              else    
+                  if [[ $offertype == $extract_offer_val ]]; then 
+                        echo "{{ Correct_Package_Acc_To_Offer }}"
+                  else
+                        echo "{{ Incorrect_Package_Acc_To_Offer }}"                                                             ## This else block refers to the check for the remaining offertypes which is supplied through pipeline variables. The value of extract_offer_val variable should not be null. Example of client package other than Base Offertype: "rhui-azure-rhel9-eus-2.3-655.noarch" .
+                  fi   
+              fi
+
+  register: output_offertype_except_byol
+  when: offer_type !='byol' 
+
+- debug:
+    var: output_offertype_except_byol 
+
+- name: "Write to error msg if incorrect client package is present according to the offertype"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n {{ Incorrect_Package_Acc_To_Offer }}"
+    create: yes
+    state: present 
+  when: ( offer_type!='byol') and ("{{ Incorrect_Package_Acc_To_Offer }}" in output_offertype_except_byol.stdout_lines)  
+
