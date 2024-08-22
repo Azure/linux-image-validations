@@ -90,9 +90,9 @@
               extract_offer_val=$(echo $package_type | sed "s/$prefix//")                                                      ## For Base Offertype, extract_offer_val should be equal to null.
 
 
-              offertype={{ offer_type }}
+              offertype={{ offer_type }}                                                                                       ## The value of offertype is passed through pipeline variables. Example: "base", "eus", "sap-ha"
               offertype=${offertype//-/}  
-              extract_offer_val=${extract_offer_val//-/}
+              extract_offer_val=${extract_offer_val//-/}                                                                       ## The "-" is removed from the offertype and extract_offer_val variable so that the comparison can be done without any special characters.
 
               echo "Print the value of the offertype passed in the pipeline variables: " $offertype
               echo "Print the value of the offertype which is present the client package name: " $extract_offer_val
