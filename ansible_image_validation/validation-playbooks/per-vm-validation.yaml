@@ -30,9 +30,18 @@
   register: users_on_machine
   ignore_errors: yes
 
-- name: Collect list of all installed packages
-  package_facts:
-    manager: "auto"
+- name: Execute command to list packages
+  shell: |
+    package_list=$( rpm -qa --qf ' "%{NAME}": { "version": " %{VERSION}", "release": "%{RELEASE}" \},' )
+    package_list=${package_list%,}
+    package_json="{  $package_list  }"
+    echo $package_json | jq -r .
+  register: package_list_output
+
+- name: Set package facts
+  set_fact:
+    ansible_facts:
+      packages: "{{ package_list_output.stdout | from_json }}"
 
 - name: Check if cloud-init is installed
   lineinfile:
@@ -108,9 +117,18 @@
 
 - name: Check for Rhui client package in the image
   block:
-  - name: Gather the package facts
-    ansible.builtin.package_facts:
-      manager: auto
+  - name: Execute command to list packages
+    shell: |
+      package_list=$( rpm -qa --qf ' "%{NAME}": { "version": " %{VERSION}", "release": "%{RELEASE}" \},' )
+      package_list=${package_list%,}
+      package_json="{ $package_list }"
+      echo $package_json | jq -r .
+    register: package_list_output
+
+  - name: Set package facts
+    set_fact:
+      ansible_facts:
+        packages: "{{ package_list_output.stdout | from_json }}"
 
   - name: Check for rhui package details
     set_fact:
