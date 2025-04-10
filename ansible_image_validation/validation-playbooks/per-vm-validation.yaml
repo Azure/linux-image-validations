@@ -25,6 +25,17 @@
     state: present
   when: "ansible_distribution_version != rhel_version"
 
+- name: Print the value of iscvm variable
+  shell: echo {{isCVM}}, {{offer_type}}, {{rhel_version}}, {{build_on_rhui4}}
+  register: printvariables
+
+- debug:
+    var: printvariables
+
+- name: check the value of iscvm is false condition
+  ansible.builtin.debug:
+    var: isCVM is false
+
 - name: Check number of users on the machine
   shell: getent passwd {1000..60000} | grep -v {{ admin_user }} | wc -l
   register: users_on_machine
@@ -59,6 +70,7 @@
     state: present
   when: users_on_machine.stdout_lines[0] != '0'
 
+
 - name: check if ADE validation is valid for this vm
   include_tasks: validation-playbooks/ade_packages_validation.yaml
   ignore_errors: yes
@@ -72,7 +84,7 @@
 - name: Check if the initramfs file is present
   stat: path=/boot/initramfs-{{ ansible_facts.kernel }}.img
   register: initramfs_present
-  when: isCVM is false
+  when: isCVM == false
 
 - name: "Write to error msg if initramfs files are not present"
   lineinfile:
@@ -80,10 +92,10 @@
     line: "\n boot validation failed since initramfs file is not present."
     create: yes
     state: present 
-  when: isCVM is false and initramfs_present.stat.exists == false
+  when: isCVM == false and initramfs_present.stat.exists == false
 
 - name: Check for NVME/PCI Drivers in image
-  when: isCVM is false and initramfs_present.stat.exists == true
+  when: isCVM == false and initramfs_present.stat.exists == true
   block:
   - name: Check if the nvme driver is present in all images
     shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep nvme
@@ -163,7 +175,7 @@
   ignore_errors: yes
 
 - name: Check for the Accelerated Networking in Rhel 9 Images.
-  when: isCVM is false and ansible_distribution_major_version == '9'
+  when: isCVM == false and ansible_distribution_major_version == '9'
   block:
     - name: Check if the unmanaged devices are present network config of all Rhel 9 Images
       shell: NetworkManager --print-config
@@ -193,4 +205,6 @@
         path: "./err_msgs.log"
         line: "\n Accelerated Networking Validation failed since unmanaged config file is not present. "
       when: not check_99_azure_unmanaged_devices_config_file.stat.exists    
+    
+
     
