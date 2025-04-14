@@ -1,0 +1,32 @@
+
+---
+
+- name: Check if the nvme driver is present in all images
+  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep nvme
+  register: check_nvme_allimages
+
+- debug:
+    msg: "NVME Validation is successful since nvme driver is present"
+
+- name: "Write to error msg if some drivers are not present"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n NVME validation failed since nvme driver is not present."
+    create: yes
+    state: present 
+  when: ("nvme" not in check_nvme_allimages.stdout)
+
+- name: Check if the pci driver is present in all images
+  shell: lsinitrd /boot/initramfs-{{ ansible_facts.kernel }}.img | grep pci
+  register: check_pci_allimages
+
+- debug:
+    msg: "NVME Validation is successful since nvme driver is present"
+
+- name: "Write to error msg if some drivers are not present"
+  lineinfile:
+    path: "{{err_folder}}/err_msgs.log"
+    line: "\n NVME validation failed since pci driver is not present. "
+    create: yes
+    state: present 
+  when: ("pci" not in check_pci_allimages.stdout) 

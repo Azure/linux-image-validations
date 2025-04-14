@@ -59,10 +59,14 @@
     state: present
   when: users_on_machine.stdout_lines[0] != '0'
 
+- name: Check if NVME Validation is valid for this VM
+  include_tasks: validation-playbooks/nvme_driver_validation.yaml
+  ignore_errors: yes
+
 - name: check if ADE validation is valid for this vm
   include_tasks: validation-playbooks/ade_packages_validation.yaml
   ignore_errors: yes
-  when: ansible_os_family == "RedHat" and (ansible_distribution_major_version == '8' or ansible_distribution_major_version == '7') and (repo_type == 'base' or repo_type =='beta')
+  when: ansible_os_family == "RedHat" and (ansible_distribution_major_version == '8' or ansible_distribution_major_version == '7') and (repo_type == 'base' or repo_type =='beta')        
 
 - name: Check if blacklisted drivers are blacklisted by modprobe service
   include_tasks: validation-playbooks/blacklisted_drivers_validation.yaml
